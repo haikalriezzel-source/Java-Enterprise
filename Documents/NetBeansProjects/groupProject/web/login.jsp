@@ -1,130 +1,111 @@
-<%-- 
-    Document   : login
-    Created on : Jun 10, 2026, 10:40:22 PM
-    Author     : haikalriez
---%>
-
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-
 <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sports Equipment and Facility Rental</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+    <link href="<%=request.getContextPath()%>/assets/css/admin.css" rel="stylesheet">
+</head>
+<body class="admin-ui-body">
 
-<html>
-    <head>
-        <meta http-equiv="Content-Type"
-              content="text/html; charset=UTF-8">
-        <title>
-            Sports Equipment and Facility Rental
-        </title>
-    </head>
+<main class="min-vh-100 d-flex align-items-center justify-content-center py-5 px-3">
+    <div class="container">
+        <div class="row justify-content-center align-items-center g-4">
+            <div class="col-12 col-lg-5">
+                <div class="mb-4 text-center text-lg-start">
+                    <div class="admin-brand-badge mb-3 mx-auto mx-lg-0">
+                        <i class="fa-solid fa-dumbbell"></i>
+                    </div>
+                    <h1 class="admin-page-title">Sports Equipment &amp; Facility Rental</h1>
+                    <p class="admin-page-subtitle">
+                        Access your dashboard to manage facilities, equipment loans, returns, and student services.
+                    </p>
+                </div>
+            </div>
 
-    <body>
+            <div class="col-12 col-md-8 col-lg-5">
+                <div class="admin-card card">
+                    <div class="card-body p-4 p-lg-5">
+                        <div class="text-center mb-4">
+                            <h2 class="fw-bold mb-1">Welcome Back</h2>
+                            <p class="admin-muted mb-0">Sign in to continue</p>
+                        </div>
 
-        <h1>Login</h1>
+                        <%
+                        String error = request.getParameter("error");
 
-        <%
-        String error =
-                request.getParameter("error");
+                        if(error != null){
+                            String errorMessage = "";
 
-        if(error != null){
+                            if(error.equals("empty")){
+                                errorMessage = "Please fill in all required fields.";
+                            } else if(error.equals("invalid")){
+                                errorMessage = "Invalid User ID or Password.";
+                            } else if(error.equals("wrongrole")){
+                                errorMessage = "Incorrect user type selected. Please select the correct role.";
+                            } else if(error.equals("driver")){
+                                errorMessage = "Database driver not found.";
+                            } else if(error.equals("database")){
+                                errorMessage = "Database connection error.";
+                            } else if(error.equals("system")){
+                                errorMessage = "Unexpected system error occurred.";
+                            }
 
-            if(error.equals("empty")){
-        %>
+                            if(!errorMessage.equals("")){
+                        %>
+                        <div class="alert alert-danger rounded-4" role="alert">
+                            <i class="fa-solid fa-circle-exclamation me-2"></i><%= errorMessage %>
+                        </div>
+                        <%
+                            }
+                        }
+                        %>
 
-        <p style="color:red;">
-            Please fill in all required fields.
-        </p>
+                        <form action="loginServlet" method="post">
+                            <div class="mb-3">
+                                <label class="form-label">User Type</label>
+                                <select class="form-select" name="userType" required>
+                                    <option value="">-- Select User Type --</option>
+                                    <option value="student">Student</option>
+                                    <option value="admin">Admin</option>
+                                </select>
+                            </div>
 
-        <%
-            } else if(error.equals("invalid")){
-        %>
+                            <div class="mb-3">
+                                <label class="form-label">User ID</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fa-regular fa-id-card"></i></span>
+                                    <input class="form-control" type="text" name="userID" placeholder="Enter your user ID">
+                                </div>
+                            </div>
 
-        <p style="color:red;">
-            Invalid User ID or Password.
-        </p>
+                            <div class="mb-4">
+                                <label class="form-label">Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+                                    <input class="form-control" type="password" name="password" placeholder="Enter your password">
+                                </div>
+                            </div>
 
-        <%
-            } else if(error.equals("wrongrole")){
-        %>
+                            <button class="btn btn-admin-primary w-100" type="submit">
+                                <i class="fa-solid fa-right-to-bracket me-2"></i>Login
+                            </button>
+                        </form>
 
-        <p style="color:red;">
-            Incorrect user type selected.
-            Please select the correct role.
-        </p>
+                        <div class="text-center mt-4">
+                            <span class="admin-muted">New student?</span>
+                            <a href="register.jsp" class="fw-bold">Register Here</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
 
-        <%
-            } else if(error.equals("driver")){
-        %>
-
-        <p style="color:red;">
-            Database driver not found.
-        </p>
-
-        <%
-            } else if(error.equals("database")){
-        %>
-
-        <p style="color:red;">
-            Database connection error.
-        </p>
-
-        <%
-            } else if(error.equals("system")){
-        %>
-
-        <p style="color:red;">
-            Unexpected system error occurred.
-        </p>
-
-        <%
-            }
-        }
-        %>
-
-        <form action="loginServlet"
-              method="post">
-
-            <label>User Type</label>
-
-            <select name="userType"
-                    required>
-
-                <option value="">
-                    -- Select User Type --
-                </option>
-
-                <option value="student">
-                    Student
-                </option>
-
-                <option value="admin">
-                    Admin
-                </option>
-
-            </select>
-
-            <p>
-                User ID
-                <input type="text"
-                       name="userID">
-            </p>
-
-            <p>
-                Password
-                <input type="password"
-                       name="password">
-            </p>
-
-            <button type="submit">
-                Login
-            </button>
-
-        </form>
-
-        <br>
-
-        <a href="register.jsp">
-            Register Here
-        </a>
-
-    </body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
 </html>

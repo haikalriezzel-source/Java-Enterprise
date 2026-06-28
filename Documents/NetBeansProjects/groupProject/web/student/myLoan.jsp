@@ -1,13 +1,17 @@
-<%-- 
+<%--
     Document   : myLoan
     Created on : Jun 24, 2026, 12:43:41 AM
     Author     : haikalriez
 --%>
 
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="com.bean.LoanEquipmentBean"%>
 
 <%
+request.setAttribute("pageTitle", "My Equipment Loans");
+request.setAttribute("pageSubtitle", "Track your active equipment loans and loan history.");
+
 ArrayList<LoanEquipmentBean> activeList =
         (ArrayList<LoanEquipmentBean>)
         request.getAttribute("activeList");
@@ -19,257 +23,290 @@ ArrayList<LoanEquipmentBean> historyList =
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
 
 <head>
 
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>My Equipment Loans</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+<link href="<%=request.getContextPath()%>/assets/css/student.css" rel="stylesheet">
 
 </head>
 
-<body>
+<body class="student-ui-body">
+
+<div class="student-shell">
+
+    <jsp:include page="layout/sidebar.jsp" />
+
+    <div class="student-main">
+
+        <jsp:include page="layout/topbar.jsp" />
+
+        <main class="student-content">
+
+            <div class="student-card card mb-4">
+                <div class="card-body">
+                    <form action="<%=request.getContextPath()%>/MyLoanServlet"
+                          method="get">
+
+                        <div class="row g-2">
+                            <div class="col-md-9">
+                                <input class="form-control"
+                                       type="text"
+                                       name="keyword"
+                                       placeholder="Search equipment..."
+                                       value="<%= request.getAttribute("keyword")==null ? "" : request.getAttribute("keyword") %>">
+                            </div>
+
+                            <div class="col-md-3 d-flex gap-2">
+                                <input class="btn btn-student-primary flex-fill"
+                                       type="submit"
+                                       value="Search">
+
+                                <a class="btn btn-student-soft"
+                                   href="<%=request.getContextPath()%>/MyLoanServlet">
+
+                                    Reset
+
+                                </a>
+                            </div>
+                        </div>
 
-<h2>My Equipment Loans</h2>
+                    </form>
+                </div>
+            </div>
 
-<form action="<%=request.getContextPath()%>/MyLoanServlet"
-      method="get">
+            <div class="student-card card mb-4">
+                <div class="card-header">
+                    <i class="fa-solid fa-handshake me-2 text-primary"></i>Current Equipment Loans
+                </div>
 
-    <input type="text"
-           name="keyword"
-           placeholder="Search equipment..."
-           value="<%= request.getAttribute("keyword")==null ? "" : request.getAttribute("keyword") %>">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-student table-hover">
 
-    <input type="submit"
-           value="Search">
+                            <thead>
+                                <tr>
+                                    <th>Loan ID</th>
+                                    <th>Equipment</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th>Quantity</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
 
-    <a href="<%=request.getContextPath()%>/MyLoanServlet">
+                            <tbody>
 
-        Reset
+                            <%
+                            if(activeList != null){
 
-    </a>
+                                if(activeList.isEmpty()){
+                            %>
 
-</form>
+                                <tr>
+                                    <td colspan="7">
+                                        <div class="student-empty">No current loan found.</div>
+                                    </td>
+                                </tr>
 
-<br>
+                            <%
+                                }
 
-<h2>Current Equipment Loans</h2>
+                                for(LoanEquipmentBean loan : activeList){
 
-<table border="1">
+                                    String status = loan.getLoanStatus();
+                                    String badge = "Approved".equalsIgnoreCase(status)
+                                            ? "badge-student-success"
+                                            : "badge-student-warning";
+                            %>
+
+                                <tr>
+                                    <td>
+                                        <span class="badge badge-student-neutral rounded-pill">
+                                            <%=loan.getLoanID()%>
+                                        </span>
+                                    </td>
 
-<tr>
+                                    <td class="fw-bold">
+                                        <%=loan.getEquipmentName()%>
+                                    </td>
 
-    <th>Loan ID</th>
-    <th>Equipment</th>
-    <th>Start Date</th>
-    <th>End Date</th>
-    <th>Quantity</th>
-    <th>Status</th>
-    <th>Action</th>
+                                    <td>
+                                        <%=loan.getStartDate()%>
+                                    </td>
 
-</tr>
+                                    <td>
+                                        <%=loan.getEndDate()%>
+                                    </td>
 
-<%
+                                    <td>
+                                        <%=loan.getLoanQuantity()%>
+                                    </td>
 
-if(activeList != null){
+                                    <td>
+                                        <span class="badge <%=badge%> rounded-pill">
+                                            <%=loan.getLoanStatus()%>
+                                        </span>
+                                    </td>
 
-    if(activeList.isEmpty()){
-%>
+                                    <td>
 
-<tr>
+                                    <%
+                                    if("Approved".equals(
+                                            loan.getLoanStatus())){
+                                    %>
 
-<td colspan="7" align="center">
+                                        <form action="<%=request.getContextPath()%>/ReturnEquipmentServlet"
+                                              method="post"
+                                              class="m-0">
 
-No current loan found.
+                                            <input type="hidden"
+                                                   name="loanID"
+                                                   value="<%=loan.getLoanID()%>">
 
-</td>
+                                            <button class="btn btn-sm btn-student-primary"
+                                                    type="submit">
 
-</tr>
+                                                Return
 
-<%
-    }
+                                            </button>
 
-    for(LoanEquipmentBean loan : activeList){
-%>
+                                        </form>
+
+                                    <%
+                                    }else{
+                                    %>
+
+                                        -
 
-<tr>
+                                    <%
+                                    }
+                                    %>
 
-<td>
+                                    </td>
+                                </tr>
 
-<%=loan.getLoanID()%>
+                            <%
+                                }
+                            }
+                            %>
 
-</td>
+                            </tbody>
 
-<td>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
-<%=loan.getEquipmentName()%>
+            <div class="student-card card">
+                <div class="card-header">
+                    <i class="fa-solid fa-clock-rotate-left me-2 text-primary"></i>Loan History
+                </div>
 
-</td>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-student table-hover">
 
-<td>
+                            <thead>
+                                <tr>
+                                    <th>Loan ID</th>
+                                    <th>Equipment</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th>Quantity</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
 
-<%=loan.getStartDate()%>
+                            <tbody>
 
-</td>
+                            <%
+                            if(historyList != null){
 
-<td>
+                                if(historyList.isEmpty()){
+                            %>
 
-<%=loan.getEndDate()%>
+                                <tr>
+                                    <td colspan="6">
+                                        <div class="student-empty">No loan history found.</div>
+                                    </td>
+                                </tr>
 
-</td>
+                            <%
+                                }
 
-<td>
+                                for(LoanEquipmentBean loan : historyList){
 
-<%=loan.getLoanQuantity()%>
+                                    String status = loan.getLoanStatus();
+                                    String badge = "Rejected".equalsIgnoreCase(status)
+                                            ? "badge-student-danger"
+                                            : "badge-student-info";
+                            %>
 
-</td>
+                                <tr>
+                                    <td>
+                                        <span class="badge badge-student-neutral rounded-pill">
+                                            <%=loan.getLoanID()%>
+                                        </span>
+                                    </td>
 
-<td>
+                                    <td class="fw-bold">
+                                        <%=loan.getEquipmentName()%>
+                                    </td>
 
-<%=loan.getLoanStatus()%>
+                                    <td>
+                                        <%=loan.getStartDate()%>
+                                    </td>
 
-</td>
+                                    <td>
+                                        <%=loan.getEndDate()%>
+                                    </td>
 
-<td>
+                                    <td>
+                                        <%=loan.getLoanQuantity()%>
+                                    </td>
 
-<%
+                                    <td>
+                                        <span class="badge <%=badge%> rounded-pill">
+                                            <%=loan.getLoanStatus()%>
+                                        </span>
+                                    </td>
+                                </tr>
 
-if("Approved".equals(
-        loan.getLoanStatus())){
-%>
+                            <%
+                                }
+                            }
+                            %>
 
-<form action="<%=request.getContextPath()%>/ReturnEquipmentServlet"
-      method="post">
+                            </tbody>
 
-    <input type="hidden"
-           name="loanID"
-           value="<%=loan.getLoanID()%>">
+                        </table>
+                    </div>
+                </div>
+            </div>
 
-    <button type="submit">
+            <div class="d-flex justify-content-end mt-4">
+                <a class="btn btn-student-soft"
+                   href="<%=request.getContextPath()%>/studentDashboard">
 
-        Return
+                    Back To Dashboard
 
-    </button>
+                </a>
+            </div>
 
-</form>
+        </main>
 
-<%
-}else{
-%>
+    </div>
 
--
+</div>
 
-<%
-}
-%>
-
-</td>
-
-</tr>
-
-<%
-    }
-}
-%>
-
-</table>
-
-<br><br>
-
-<hr>
-
-<h2>Loan History</h2>
-
-<table border="1">
-
-<tr>
-
-    <th>Loan ID</th>
-    <th>Equipment</th>
-    <th>Start Date</th>
-    <th>End Date</th>
-    <th>Quantity</th>
-    <th>Status</th>
-
-</tr>
-
-<%
-
-if(historyList != null){
-
-    if(historyList.isEmpty()){
-%>
-
-<tr>
-
-<td colspan="6"
-    align="center">
-
-No loan history found.
-
-</td>
-
-</tr>
-
-<%
-    }
-
-    for(LoanEquipmentBean loan : historyList){
-%>
-
-<tr>
-
-<td>
-
-<%=loan.getLoanID()%>
-
-</td>
-
-<td>
-
-<%=loan.getEquipmentName()%>
-
-</td>
-
-<td>
-
-<%=loan.getStartDate()%>
-
-</td>
-
-<td>
-
-<%=loan.getEndDate()%>
-
-</td>
-
-<td>
-
-<%=loan.getLoanQuantity()%>
-
-</td>
-
-<td>
-
-<%=loan.getLoanStatus()%>
-
-</td>
-
-</tr>
-
-<%
-    }
-}
-%>
-
-</table>
-
-<br>
-
-<a href="<%=request.getContextPath()%>/studentDashboard">
-
-Back To Dashboard
-
-</a>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 

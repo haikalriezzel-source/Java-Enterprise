@@ -62,7 +62,7 @@ public class AddEquipmentServlet extends HttpServlet {
                             "_");
 
             String uploadPath =
-                    "C:\\Users\\haikalriez\\Documents\\NetBeansProjects\\groupProject\\web\\uploads";
+                    "C:\\Users\\saf\\Documents\\NetBeansProjectss\\Java-Enterprise\\Documents\\NetBeansProjects\\groupProject\\web\\uploads";
 
             File uploadDir =
                     new File(uploadPath);

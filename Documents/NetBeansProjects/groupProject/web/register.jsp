@@ -1,128 +1,107 @@
-<%-- 
-    Document   : register
-    Created on : Jun 10, 2026, 11:24:37 PM
-    Author     : haikalriez
---%>
-
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-
 <!DOCTYPE html>
-
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Registration</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+    <link href="<%=request.getContextPath()%>/assets/css/admin.css" rel="stylesheet">
 </head>
+<body class="admin-ui-body">
 
-<body>
+<main class="min-vh-100 d-flex align-items-center justify-content-center py-5 px-3">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-8 col-xl-7">
+                <div class="text-center mb-4">
+                    <div class="admin-brand-badge mx-auto mb-3">
+                        <i class="fa-solid fa-user-plus"></i>
+                    </div>
+                    <h1 class="admin-page-title">Student Registration</h1>
+                    <p class="admin-page-subtitle">Create your student account to access equipment and facility rental services.</p>
+                </div>
 
-    <h2>Student Registration</h2>
+                <div class="admin-card card">
+                    <div class="card-body p-4 p-lg-5">
+                        <%
+                        String error = request.getParameter("error");
 
-    <%
-    String error =
-            request.getParameter("error");
+                        if(error != null){
+                            String errorMessage = "";
 
-    if(error != null){
+                            if(error.equals("empty")){
+                                errorMessage = "Please fill in all required fields.";
+                            } else if(error.equals("duplicate")){
+                                errorMessage = "Student ID already exists.";
+                            } else if(error.equals("date")){
+                                errorMessage = "Invalid date format.";
+                            } else if(error.equals("database")){
+                                errorMessage = "Database connection error.";
+                            } else if(error.equals("system")){
+                                errorMessage = "Unexpected system error occurred.";
+                            }
 
-        if(error.equals("empty")){
-    %>
+                            if(!errorMessage.equals("")){
+                        %>
+                        <div class="alert alert-danger rounded-4" role="alert">
+                            <i class="fa-solid fa-circle-exclamation me-2"></i><%= errorMessage %>
+                        </div>
+                        <%
+                            }
+                        }
+                        %>
 
-    <p style="color:red;">
-        Please fill in all required fields.
-    </p>
+                        <form action="RegisterServlet" method="post">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Student ID</label>
+                                    <input class="form-control" type="text" name="studentID" required>
+                                </div>
 
-    <%
-        } else if(error.equals("duplicate")){
-    %>
+                                <div class="col-md-6">
+                                    <label class="form-label">Full Name</label>
+                                    <input class="form-control" type="text" name="studentName" required>
+                                </div>
 
-    <p style="color:red;">
-        Student ID already exists.
-    </p>
+                                <div class="col-md-6">
+                                    <label class="form-label">Date of Birth</label>
+                                    <input class="form-control" type="date" name="studentDOB" required>
+                                </div>
 
-    <%
-        } else if(error.equals("date")){
-    %>
+                                <div class="col-md-6">
+                                    <label class="form-label">Programme</label>
+                                    <input class="form-control" type="text" name="programme" required>
+                                </div>
 
-    <p style="color:red;">
-        Invalid date format.
-    </p>
+                                <div class="col-md-6">
+                                    <label class="form-label">Phone Number</label>
+                                    <input class="form-control" type="text" name="phoneNumber" required>
+                                </div>
 
-    <%
-        } else if(error.equals("database")){
-    %>
+                                <div class="col-md-6">
+                                    <label class="form-label">Password</label>
+                                    <input class="form-control" type="password" name="password" required>
+                                </div>
+                            </div>
 
-    <p style="color:red;">
-        Database connection error.
-    </p>
+                            <div class="d-grid gap-2 mt-4">
+                                <button class="btn btn-admin-primary" type="submit">
+                                    <i class="fa-solid fa-user-plus me-2"></i>Register
+                                </button>
+                                <a href="login.jsp" class="btn btn-admin-soft">
+                                    <i class="fa-solid fa-arrow-left me-2"></i>Back to Login
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
 
-    <%
-        } else if(error.equals("system")){
-    %>
-
-    <p style="color:red;">
-        Unexpected system error occurred.
-    </p>
-
-    <%
-        }
-    }
-    %>
-
-    <form action="RegisterServlet"
-          method="post">
-
-        <p>
-            Student ID:
-            <input type="text"
-                   name="studentID"
-                   required>
-        </p>
-
-        <p>
-            Full Name:
-            <input type="text"
-                   name="studentName"
-                   required>
-        </p>
-
-        <p>
-            Date of Birth:
-            <input type="date"
-                   name="studentDOB"
-                   required>
-        </p>
-
-        <p>
-            Programme:
-            <input type="text"
-                   name="programme"
-                   required>
-        </p>
-
-        <p>
-            Phone Number:
-            <input type="text"
-                   name="phoneNumber"
-                   required>
-        </p>
-
-        <p>
-            Password:
-            <input type="password"
-                   name="password"
-                   required>
-        </p>
-
-        <input type="submit"
-               value="Register">
-
-    </form>
-
-    <br>
-
-    <a href="login.jsp">
-        Back to Login
-    </a>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
