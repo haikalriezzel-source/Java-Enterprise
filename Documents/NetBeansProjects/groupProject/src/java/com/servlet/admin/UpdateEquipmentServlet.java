@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.servlet;
+package com.servlet.admin;
 import util.DBConnection;
 
 import java.io.IOException;
@@ -19,8 +19,8 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author haikalriez
  */
-@WebServlet("/UpdateEquipmetServlet")
-public class UpdateEquipmetServlet extends HttpServlet {
+@WebServlet("/UpdateEquipmentServlet")
+public class UpdateEquipmentServlet extends HttpServlet {
 
     @Override
     protected void doPost(

@@ -102,10 +102,28 @@ protected void doPost(
                 "Pending");
 
         psReturn.executeUpdate();
+        
+        String updateLoan =
+        "UPDATE LoanEquipment "
+      + "SET loanStatus=? "
+      + "WHERE loanID=?";
+
+        PreparedStatement psUpdate = conn.prepareStatement(updateLoan);
+
+        psUpdate.setString(1, "Returning");
+
+        psUpdate.setInt(2,loanID);
+
+        psUpdate.executeUpdate();
+
+        psUpdate.close();
+
+        HttpSession session = request.getSession();
+        session.setAttribute("scrollToHistory", true);
 
         response.sendRedirect(
-                request.getContextPath()
-                + "/MyLoanServlet");
+            request.getContextPath()
+            + "/MyLoanServlet");
 
     } catch(Exception e) {
 

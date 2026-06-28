@@ -204,7 +204,7 @@ ArrayList<LoanEquipmentBean> historyList =
                 </div>
             </div>
 
-            <div class="student-card card">
+            <div class="student-card card" id="loanHistory">
                 <div class="card-header">
                     <i class="fa-solid fa-clock-rotate-left me-2 text-primary"></i>Loan History
                 </div>
@@ -307,6 +307,24 @@ ArrayList<LoanEquipmentBean> historyList =
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+window.onload = function () {
+
+<%
+if(request.getAttribute("scrollToHistory") != null){
+%>
+
+    document.getElementById("loanHistory").scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
+
+<%
+}
+%>
+
+};
+</script>
 
 </body>
 

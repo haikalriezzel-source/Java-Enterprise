@@ -162,6 +162,14 @@ public class MyLoanServlet extends HttpServlet {
                     "keyword",
                     keyword);
 
+            if (session.getAttribute("scrollToHistory") != null) {
+
+            request.setAttribute("scrollToHistory", true);
+
+            session.removeAttribute("scrollToHistory");
+            
+            }
+            
             RequestDispatcher rd =
                     request.getRequestDispatcher(
                             "student/myLoan.jsp");
