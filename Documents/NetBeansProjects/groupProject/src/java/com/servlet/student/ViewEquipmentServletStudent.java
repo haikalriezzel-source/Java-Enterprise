@@ -25,61 +25,27 @@ import javax.servlet.RequestDispatcher;
 public class ViewEquipmentServletStudent extends HttpServlet {
 
     @Override
-    protected void doGet(
-            HttpServletRequest request,
+    protected void doGet(HttpServletRequest request,
             HttpServletResponse response)
             throws ServletException, IOException {
 
         ArrayList<equipmentBean> equipmentList =
                 new ArrayList<>();
 
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-
         try {
 
-            conn =
+            Connection conn =
                     DBConnection.getConnection();
 
-            String keyword =
-                    request.getParameter("keyword");
+            String sql =
+                    "SELECT * "
+                  + "FROM Equipment "
+                  + "ORDER BY equipmentName";
 
-            String sql;
+            PreparedStatement ps =
+                    conn.prepareStatement(sql);
 
-            if (keyword != null
-                    && !keyword.trim().isEmpty()) {
-
-                sql =
-                        "SELECT * FROM Equipment "
-                      + "WHERE equipmentStatus='Available' "
-                      + "AND (LOWER(equipmentName) LIKE ? "
-                      + "OR LOWER(brandModel) LIKE ? "
-                      + "OR LOWER(equipmentStatus) LIKE ?) "
-                      + "ORDER BY equipmentID";
-
-                ps =
-                        conn.prepareStatement(sql);
-
-                String search =
-                        "%" + keyword.toLowerCase() + "%";
-
-                ps.setString(1, search);
-                ps.setString(2, search);
-                ps.setString(3, search);
-
-            } else {
-
-                sql =
-                        "SELECT * FROM Equipment "
-                      + "WHERE equipmentStatus='Available' "
-                      + "ORDER BY equipmentID";
-
-                ps =
-                        conn.prepareStatement(sql);
-            }
-
-            rs =
+            ResultSet rs =
                     ps.executeQuery();
 
             while (rs.next()) {
@@ -96,25 +62,30 @@ public class ViewEquipmentServletStudent extends HttpServlet {
                 equipment.setBrandModel(
                         rs.getString("brandModel"));
 
-                equipment.setQuantity(
-                        rs.getInt("quantity"));
+                equipment.setTotalQuantity(
+                        rs.getInt("totalQuantity"));
 
-                equipment.setEquipmentStatus(
-                        rs.getString("equipmentStatus"));
+                equipment.setAvailableQuantity(
+                        rs.getInt("availableQuantity"));
+
+                equipment.setMaintenanceQuantity(
+                        rs.getInt("maintenanceQuantity"));
+
+                equipment.setDamagedQuantity(
+                        rs.getInt("damagedQuantity"));
 
                 equipment.setEquipmentImage(
                         rs.getString("equipmentImage"));
 
                 equipmentList.add(equipment);
+
             }
 
             request.setAttribute(
                     "equipmentList",
                     equipmentList);
 
-            request.setAttribute(
-                    "keyword",
-                    keyword);
+            conn.close();
 
             RequestDispatcher rd =
                     request.getRequestDispatcher(
@@ -132,23 +103,8 @@ public class ViewEquipmentServletStudent extends HttpServlet {
                     "Error : "
                     + e.getMessage());
 
-        } finally {
-
-            try {
-
-                if (rs != null)
-                    rs.close();
-
-                if (ps != null)
-                    ps.close();
-
-                if (conn != null)
-                    conn.close();
-
-            } catch (Exception e) {
-
-                e.printStackTrace();
-            }
         }
+
     }
+
 }

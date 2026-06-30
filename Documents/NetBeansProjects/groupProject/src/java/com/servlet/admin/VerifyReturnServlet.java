@@ -19,8 +19,7 @@ import javax.servlet.http.*;
 public class VerifyReturnServlet extends HttpServlet {
 
     @Override
-    protected void doPost(
-            HttpServletRequest request,
+    protected void doPost(HttpServletRequest request,
             HttpServletResponse response)
             throws IOException {
 
@@ -28,30 +27,23 @@ public class VerifyReturnServlet extends HttpServlet {
 
             int returnID =
                     Integer.parseInt(
-                            request.getParameter(
-                                    "returnID"));
+                            request.getParameter("returnID"));
 
             String condition =
-                    request.getParameter(
-                            "equipmentCondition");
+                    request.getParameter("equipmentCondition");
 
             Connection conn =
                     DBConnection.getConnection();
 
             String getReturn =
-                    "SELECT loanID, "
-                  + "equipmentID, "
-                  + "returnQuantity "
+                    "SELECT loanID, equipmentID, returnQuantity "
                   + "FROM ReturnRecord "
                   + "WHERE returnID=?";
 
             PreparedStatement psReturn =
-                    conn.prepareStatement(
-                            getReturn);
+                    conn.prepareStatement(getReturn);
 
-            psReturn.setInt(
-                    1,
-                    returnID);
+            psReturn.setInt(1, returnID);
 
             ResultSet rs =
                     psReturn.executeQuery();
@@ -63,136 +55,114 @@ public class VerifyReturnServlet extends HttpServlet {
             if (rs.next()) {
 
                 loanID =
-                        rs.getInt(
-                                "loanID");
+                        rs.getInt("loanID");
 
                 equipmentID =
-                        rs.getInt(
-                                "equipmentID");
+                        rs.getInt("equipmentID");
 
                 returnQuantity =
-                        rs.getInt(
-                                "returnQuantity");
+                        rs.getInt("returnQuantity");
             }
 
-            /*
-             * GOOD / MINOR DAMAGE
-             * Add stock back
-             */
-            if ("Good".equals(condition)
-                    || "Minor Damage".equals(condition)) {
+            // GOOD
+            if ("Good".equals(condition)) {
 
-                String updateEquipment =
-                        "UPDATE Equipment "
-                      + "SET quantity = quantity + ? "
-                      + "WHERE equipmentID=?";
-
-                PreparedStatement psEquip =
+                PreparedStatement ps =
                         conn.prepareStatement(
-                                updateEquipment);
 
-                psEquip.setInt(
-                        1,
-                        returnQuantity);
-
-                psEquip.setInt(
-                        2,
-                        equipmentID);
-
-                psEquip.executeUpdate();
-
-                String updateStatus =
                         "UPDATE Equipment "
-                      + "SET equipmentStatus='Available' "
-                      + "WHERE equipmentID=?";
+                      + "SET availableQuantity = availableQuantity + ? "
+                      + "WHERE equipmentID=?");
 
-                PreparedStatement psStatus =
-                        conn.prepareStatement(
-                                updateStatus);
+                ps.setInt(1, returnQuantity);
+                ps.setInt(2, equipmentID);
 
-                psStatus.setInt(
-                        1,
-                        equipmentID);
+                ps.executeUpdate();
 
-                psStatus.executeUpdate();
+                ps.close();
             }
 
-            /*
-             * MAJOR DAMAGE
-             */
+            // MINOR DAMAGE
+            else if ("Minor Damage".equals(condition)) {
+
+                PreparedStatement ps =
+                        conn.prepareStatement(
+
+                        "UPDATE Equipment "
+                      + "SET maintenanceQuantity = maintenanceQuantity + ? "
+                      + "WHERE equipmentID=?");
+
+                ps.setInt(1, returnQuantity);
+                ps.setInt(2, equipmentID);
+
+                ps.executeUpdate();
+
+                ps.close();
+
+            }
+
+            // MAJOR DAMAGE
             else if ("Major Damage".equals(condition)) {
 
-                String updateStatus =
-                        "UPDATE Equipment "
-                      + "SET equipmentStatus='Damaged' "
-                      + "WHERE equipmentID=?";
-
-                PreparedStatement psStatus =
+                PreparedStatement ps =
                         conn.prepareStatement(
-                                updateStatus);
 
-                psStatus.setInt(
-                        1,
-                        equipmentID);
+                        "UPDATE Equipment "
+                      + "SET damagedQuantity = damagedQuantity + ? "
+                      + "WHERE equipmentID=?");
 
-                psStatus.executeUpdate();
+                ps.setInt(1, returnQuantity);
+                ps.setInt(2, equipmentID);
+
+                ps.executeUpdate();
+
+                ps.close();
+
             }
 
-            /*
-             * LOST
-             */
+            // LOST
             else if ("Lost".equals(condition)) {
 
-                String updateStatus =
-                        "UPDATE Equipment "
-                      + "SET equipmentStatus='In-Maintenance' "
-                      + "WHERE equipmentID=?";
-
-                PreparedStatement psStatus =
+                PreparedStatement ps =
                         conn.prepareStatement(
-                                updateStatus);
 
-                psStatus.setInt(
-                        1,
-                        equipmentID);
+                        "UPDATE Equipment "
+                      + "SET totalQuantity = totalQuantity - ? "
+                      + "WHERE equipmentID=?");
 
-                psStatus.executeUpdate();
+                ps.setInt(1, returnQuantity);
+                ps.setInt(2, equipmentID);
+
+                ps.executeUpdate();
+
+                ps.close();
+
             }
 
-            /*
-             * Update Return Record
-             */
-            String updateReturn =
+            PreparedStatement psReturnUpdate =
+                    conn.prepareStatement(
+
                     "UPDATE ReturnRecord "
                   + "SET returnStatus='Verified', "
                   + "equipmentCondition=? "
-                  + "WHERE returnID=?";
+                  + "WHERE returnID=?");
 
-            PreparedStatement psUpdateReturn =
-                    conn.prepareStatement(
-                            updateReturn);
-
-            psUpdateReturn.setString(
+            psReturnUpdate.setString(
                     1,
                     condition);
 
-            psUpdateReturn.setInt(
+            psReturnUpdate.setInt(
                     2,
                     returnID);
 
-            psUpdateReturn.executeUpdate();
-
-            /*
-             * Update Loan Status
-             */
-            String updateLoan =
-                    "UPDATE LoanEquipment "
-                  + "SET loanStatus='Verified' "
-                  + "WHERE loanID=?";
+            psReturnUpdate.executeUpdate();
 
             PreparedStatement psLoan =
                     conn.prepareStatement(
-                            updateLoan);
+
+                    "UPDATE LoanEquipment "
+                  + "SET loanStatus='Verified' "
+                  + "WHERE loanID=?");
 
             psLoan.setInt(
                     1,
@@ -200,6 +170,10 @@ public class VerifyReturnServlet extends HttpServlet {
 
             psLoan.executeUpdate();
 
+            psLoan.close();
+            psReturnUpdate.close();
+            psReturn.close();
+            rs.close();
             conn.close();
 
             response.sendRedirect(
@@ -212,6 +186,9 @@ public class VerifyReturnServlet extends HttpServlet {
             response.getWriter().println(
                     "Error : "
                     + e.getMessage());
+
         }
+
     }
+
 }

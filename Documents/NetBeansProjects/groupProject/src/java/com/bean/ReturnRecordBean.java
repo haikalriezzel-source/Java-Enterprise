@@ -21,6 +21,7 @@ public class ReturnRecordBean {
     private String equipmentCondition;
     private String returnStatus;
     private String studentName;
+    private String equipmentName;
 
     public int getReturnID() {
         return returnID;
@@ -92,5 +93,13 @@ public void setStudentID(String studentID) {
 
     public void setStudentName(String studentName) {
         this.studentName = studentName;
+    }
+    
+    public String getEquipmentName() {
+        return equipmentName;
+    }
+
+    public void setEquipmentName(String equipmentName) {
+        this.equipmentName = equipmentName;
     }
 }

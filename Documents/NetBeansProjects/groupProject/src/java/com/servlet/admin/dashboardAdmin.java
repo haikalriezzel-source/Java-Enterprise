@@ -163,46 +163,33 @@ public class dashboardAdmin extends HttpServlet {
             // =========================
 
             PreparedStatement ps8 =
-                    conn.prepareStatement(
-                            "SELECT COUNT(*) "
-                          + "FROM Equipment "
-                          + "WHERE equipmentStatus='Available'");
+        conn.prepareStatement(
 
-            ResultSet rs8 =
-                    ps8.executeQuery();
+        "SELECT "
+      + "COALESCE(SUM(availableQuantity),0), "
+      + "COALESCE(SUM(maintenanceQuantity),0), "
+      + "COALESCE(SUM(damagedQuantity),0) "
+      + "FROM Equipment");
 
-            rs8.next();
+ResultSet rs8 =
+        ps8.executeQuery();
 
-            int availableEquipment =
-                    rs8.getInt(1);
+int availableEquipment = 0;
+int maintenanceEquipment = 0;
+int damagedEquipment = 0;
 
-            PreparedStatement ps9 =
-                    conn.prepareStatement(
-                            "SELECT COUNT(*) "
-                          + "FROM Equipment "
-                          + "WHERE equipmentStatus='Damaged'");
+if(rs8.next()){
 
-            ResultSet rs9 =
-                    ps9.executeQuery();
+    availableEquipment =
+            rs8.getInt(1);
 
-            rs9.next();
+    maintenanceEquipment =
+            rs8.getInt(2);
 
-            int damagedEquipment =
-                    rs9.getInt(1);
+    damagedEquipment =
+            rs8.getInt(3);
 
-            PreparedStatement ps10 =
-                    conn.prepareStatement(
-                            "SELECT COUNT(*) "
-                          + "FROM Equipment "
-                          + "WHERE equipmentStatus='In-Maintenance'");
-
-            ResultSet rs10 =
-                    ps10.executeQuery();
-
-            rs10.next();
-
-            int maintenanceEquipment =
-                    rs10.getInt(1);
+}
 
             // =========================
             // LOW STOCK REPORT
@@ -212,7 +199,7 @@ public class dashboardAdmin extends HttpServlet {
                     conn.prepareStatement(
                             "SELECT COUNT(*) "
                           + "FROM Equipment "
-                          + "WHERE quantity <= 3");
+                          + "WHERE availableQuantity <= 3");
 
             ResultSet rs11 =
                     ps11.executeQuery();

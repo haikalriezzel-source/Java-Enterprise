@@ -19,50 +19,24 @@ import javax.servlet.http.HttpServletResponse;
 public class ViewEquipmentServlet extends HttpServlet {
 
     @Override
-    protected void doGet(
-            HttpServletRequest request,
+    protected void doGet(HttpServletRequest request,
             HttpServletResponse response)
             throws ServletException, IOException {
 
-        Connection conn = null;
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-
         try {
 
-            conn = DBConnection.getConnection();
+            Connection conn =
+                    DBConnection.getConnection();
 
-            String keyword =
-                    request.getParameter("keyword");
+            String sql =
+                    "SELECT * FROM Equipment "
+                  + "ORDER BY equipmentName";
 
-            String sql;
+            PreparedStatement ps =
+                    conn.prepareStatement(sql);
 
-            if (keyword != null && !keyword.trim().isEmpty()) {
-
-                sql =
-                        "SELECT * FROM Equipment "
-                      + "WHERE LOWER(equipmentName) LIKE ? "
-                      + "OR LOWER(brandModel) LIKE ? "
-                      + "OR LOWER(equipmentStatus) LIKE ?";
-
-                ps = conn.prepareStatement(sql);
-
-                String search =
-                        "%" + keyword.toLowerCase() + "%";
-
-                ps.setString(1, search);
-                ps.setString(2, search);
-                ps.setString(3, search);
-
-            } else {
-
-                sql =
-                        "SELECT * FROM Equipment";
-
-                ps = conn.prepareStatement(sql);
-            }
-
-            rs = ps.executeQuery();
+            ResultSet rs =
+                    ps.executeQuery();
 
             ArrayList<equipmentBean> equipmentList =
                     new ArrayList<>();
@@ -81,54 +55,47 @@ public class ViewEquipmentServlet extends HttpServlet {
                 equipment.setBrandModel(
                         rs.getString("brandModel"));
 
-                equipment.setQuantity(
-                        rs.getInt("quantity"));
+                equipment.setTotalQuantity(
+                        rs.getInt("totalQuantity"));
 
-                equipment.setEquipmentStatus(
-                        rs.getString("equipmentStatus"));
+                equipment.setAvailableQuantity(
+                        rs.getInt("availableQuantity"));
+
+                equipment.setMaintenanceQuantity(
+                        rs.getInt("maintenanceQuantity"));
+
+                equipment.setDamagedQuantity(
+                        rs.getInt("damagedQuantity"));
 
                 equipment.setEquipmentImage(
                         rs.getString("equipmentImage"));
 
                 equipmentList.add(equipment);
+
             }
 
             request.setAttribute(
                     "equipmentList",
                     equipmentList);
 
-            request.setAttribute(
-                    "keyword",
-                    keyword);
+            conn.close();
 
             request.getRequestDispatcher(
                     "/admin/manageEquipment.jsp")
-                    .forward(request, response);
+                    .forward(
+                            request,
+                            response);
 
         } catch (Exception e) {
 
             e.printStackTrace();
 
             response.getWriter().println(
-                    "Error : " + e.getMessage());
+                    "Error : "
+                    + e.getMessage());
 
-        } finally {
-
-            try {
-
-                if (rs != null)
-                    rs.close();
-
-                if (ps != null)
-                    ps.close();
-
-                if (conn != null)
-                    conn.close();
-
-            } catch (Exception e) {
-
-                e.printStackTrace();
-            }
         }
+
     }
+
 }

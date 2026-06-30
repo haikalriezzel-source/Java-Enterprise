@@ -106,7 +106,7 @@ public class BorrowEquipmentServlet extends HttpServlet {
 
             // Check Equipment Stock
             String stockSql =
-                    "SELECT quantity "
+                    "SELECT availableQuantity "
                     + "FROM Equipment "
                     + "WHERE equipmentID = ?";
 
@@ -127,7 +127,7 @@ public class BorrowEquipmentServlet extends HttpServlet {
 
                 availableStock =
                         rsStock.getInt(
-                                "quantity");
+                                "availableQuantity");
             }
 
             if (quantity > availableStock) {

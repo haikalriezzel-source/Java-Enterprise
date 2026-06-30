@@ -12,10 +12,12 @@ package com.bean;
 public class equipmentBean {
    private String equipmentName;
     private String brandModel;
-    private int quantity;
     private String equipmentImage;
     private int equipmentID;
-    private String equipmentStatus;
+    private int totalQuantity;
+    private int availableQuantity;
+    private int maintenanceQuantity;
+    private int damagedQuantity;
 
     public equipmentBean() {
     }
@@ -36,14 +38,6 @@ public class equipmentBean {
         this.brandModel = brandModel;
     }
 
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
-
     public String getEquipmentImage() {
         return equipmentImage;
     }
@@ -60,12 +54,36 @@ public class equipmentBean {
     this.equipmentID = equipmentID;
     }
     
-    public String getEquipmentStatus() {
-    return equipmentStatus;
+    public int getTotalQuantity() {
+    return totalQuantity;
     }
     
-    public void setEquipmentStatus(String equipmentStatus) {
-    this.equipmentStatus =equipmentStatus;
+    public void setTotalQuantity(int totalQuantity) {
+    this.totalQuantity =totalQuantity;
+    }
+    
+    public int getAvailableQuantity() {
+    return availableQuantity;
+    }
+    
+    public void setAvailableQuantity(int availableQuantity) {
+    this.availableQuantity =availableQuantity;
+    }
+    
+    public int getDamagedQuantity() {
+    return damagedQuantity;
+    }
+    
+    public void setDamagedQuantity(int damagedQuantity) {
+    this.damagedQuantity =damagedQuantity;
+    }
+    
+    public int getMaintenanceQuantity() {
+    return maintenanceQuantity;
+    }
+    
+    public void setMaintenanceQuantity(int maintenanceQuantity) {
+    this.maintenanceQuantity =maintenanceQuantity;
     }
 } 
 

@@ -11,182 +11,195 @@ import javax.servlet.http.*;
 @WebServlet("/ApproveLoanServlet")
 public class ApproveLoanServlet extends HttpServlet {
 
-@Override
-protected void doPost(
-        HttpServletRequest request,
-        HttpServletResponse response)
-        throws IOException {
+    @Override
+    protected void doPost(
+            HttpServletRequest request,
+            HttpServletResponse response)
+            throws IOException {
 
-    try {
+        try {
 
-        HttpSession session =
-                request.getSession();
+            HttpSession session =
+                    request.getSession();
 
-        String adminID =
-                (String) session.getAttribute(
-                        "adminID");
+            String adminID =
+                    (String) session.getAttribute(
+                            "adminID");
 
-        int loanID =
-                Integer.parseInt(
-                        request.getParameter(
-                                "loanID"));
+            int loanID =
+                    Integer.parseInt(
+                            request.getParameter(
+                                    "loanID"));
 
-        String action =
-                request.getParameter(
-                        "action");
+            String action =
+                    request.getParameter(
+                            "action");
 
-        Connection conn =
-                DBConnection.getConnection();
+            Connection conn =
+                    DBConnection.getConnection();
 
-        String loanSql =
-                "SELECT equipmentID, "
-              + "loanQuantity "
-              + "FROM LoanEquipment "
-              + "WHERE loanID=?";
+            String loanSql =
+                    "SELECT equipmentID, "
+                  + "loanQuantity "
+                  + "FROM LoanEquipment "
+                  + "WHERE loanID=?";
 
-        PreparedStatement psLoan =
-                conn.prepareStatement(
-                        loanSql);
-
-        psLoan.setInt(
-                1,
-                loanID);
-
-        ResultSet rs =
-                psLoan.executeQuery();
-
-        int equipmentID = 0;
-        int quantity = 0;
-
-        if (rs.next()) {
-
-            equipmentID =
-                    rs.getInt(
-                            "equipmentID");
-
-            quantity =
-                    rs.getInt(
-                            "loanQuantity");
-        }
-
-        if ("Approved".equals(action)) {
-
-            String checkStock =
-                    "SELECT quantity "
-                  + "FROM Equipment "
-                  + "WHERE equipmentID=?";
-
-            PreparedStatement psCheck =
+            PreparedStatement psLoan =
                     conn.prepareStatement(
-                            checkStock);
+                            loanSql);
 
-            psCheck.setInt(
+            psLoan.setInt(
                     1,
-                    equipmentID);
+                    loanID);
 
-            ResultSet rsCheck =
-                    psCheck.executeQuery();
+            ResultSet rs =
+                    psLoan.executeQuery();
 
-            int currentStock = 0;
+            int equipmentID = 0;
+            int loanQuantity = 0;
 
-            if (rsCheck.next()) {
+            if (rs.next()) {
 
-                currentStock =
-                        rsCheck.getInt(
-                                "quantity");
+                equipmentID =
+                        rs.getInt(
+                                "equipmentID");
+
+                loanQuantity =
+                        rs.getInt(
+                                "loanQuantity");
             }
 
-            if (quantity > currentStock) {
+            if ("Approved".equals(action)) {
 
-                response.getWriter().println(
-                        "<script>"
-                      + "alert('Not enough stock available!');"
-                      + "window.location='AdminLoanListServlet';"
-                      + "</script>");
+                String checkStock =
+                        "SELECT availableQuantity "
+                      + "FROM Equipment "
+                      + "WHERE equipmentID=?";
 
-                return;
+                PreparedStatement psCheck =
+                        conn.prepareStatement(
+                                checkStock);
+
+                psCheck.setInt(
+                        1,
+                        equipmentID);
+
+                ResultSet rsCheck =
+                        psCheck.executeQuery();
+
+                int availableStock = 0;
+
+                if (rsCheck.next()) {
+
+                    availableStock =
+                            rsCheck.getInt(
+                                    "availableQuantity");
+                }
+
+                if (loanQuantity > availableStock) {
+
+                    response.getWriter().println(
+                            "<script>"
+                          + "alert('Not enough available stock!');"
+                          + "window.location='AdminLoanListServlet';"
+                          + "</script>");
+
+                    return;
+
+                }
+
+                String updateEquipment =
+                        "UPDATE Equipment "
+                      + "SET availableQuantity = availableQuantity - ? "
+                      + "WHERE equipmentID=?";
+
+                PreparedStatement psEquip =
+                        conn.prepareStatement(
+                                updateEquipment);
+
+                psEquip.setInt(
+                        1,
+                        loanQuantity);
+
+                psEquip.setInt(
+                        2,
+                        equipmentID);
+
+                psEquip.executeUpdate();
+
+                psEquip.close();
+
+                psCheck.close();
+
+                rsCheck.close();
+
             }
 
-            String updateEquipment =
-                    "UPDATE Equipment "
-                  + "SET quantity = quantity - ? "
-                  + "WHERE equipmentID=?";
+            String updateLoan =
+                    "UPDATE LoanEquipment "
+                  + "SET loanStatus=? "
+                  + "WHERE loanID=?";
 
-            PreparedStatement psEquip =
+            PreparedStatement psUpdate =
                     conn.prepareStatement(
-                            updateEquipment);
+                            updateLoan);
 
-            psEquip.setInt(
+            psUpdate.setString(
                     1,
-                    quantity);
+                    action);
 
-            psEquip.setInt(
+            psUpdate.setInt(
                     2,
-                    equipmentID);
+                    loanID);
 
-            psEquip.executeUpdate();
+            psUpdate.executeUpdate();
+
+            String insertApproval =
+                    "INSERT INTO LoanApproval "
+                  + "(loanID, adminID, approvalStatus, remarks) "
+                  + "VALUES (?, ?, ?, ?)";
+
+            PreparedStatement psApproval =
+                    conn.prepareStatement(
+                            insertApproval);
+
+            psApproval.setInt(
+                    1,
+                    loanID);
+
+            psApproval.setString(
+                    2,
+                    adminID);
+
+            psApproval.setString(
+                    3,
+                    action);
+
+            psApproval.setString(
+                    4,
+                    "-");
+
+            psApproval.executeUpdate();
+
+            psApproval.close();
+            psUpdate.close();
+            psLoan.close();
+            rs.close();
+            conn.close();
+
+            response.sendRedirect(
+                    "AdminLoanListServlet");
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+            response.getWriter().println(
+                    "Loan Approval Error : "
+                    + e.getMessage());
+
         }
 
-        String updateLoan =
-                "UPDATE LoanEquipment "
-              + "SET loanStatus=? "
-              + "WHERE loanID=?";
-
-        PreparedStatement psUpdate =
-                conn.prepareStatement(
-                        updateLoan);
-
-        psUpdate.setString(
-                1,
-                action);
-
-        psUpdate.setInt(
-                2,
-                loanID);
-
-        psUpdate.executeUpdate();
-
-        String insertApproval =
-                "INSERT INTO LoanApproval "
-              + "(loanID, adminID, "
-              + "approvalStatus, remarks) "
-              + "VALUES (?, ?, ?, ?)";
-
-        PreparedStatement psApproval =
-                conn.prepareStatement(
-                        insertApproval);
-
-        psApproval.setInt(
-                1,
-                loanID);
-
-        psApproval.setString(
-                2,
-                adminID);
-
-        psApproval.setString(
-                3,
-                action);
-
-        psApproval.setString(
-                4,
-                "-");
-
-        psApproval.executeUpdate();
-
-        conn.close();
-
-        response.sendRedirect(
-                "AdminLoanListServlet");
-
-    } catch (Exception e) {
-
-        e.printStackTrace();
-
-        response.getWriter().println(
-                "Loan Approval Error: "
-                + e.getMessage());
     }
-}
 
 }

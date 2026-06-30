@@ -5,6 +5,10 @@ import util.DBConnection;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 
@@ -15,18 +19,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 
 @WebServlet("/AddEquipmentServlet")
 @MultipartConfig
 public class AddEquipmentServlet extends HttpServlet {
 
     @Override
-    protected void doPost(
-            HttpServletRequest request,
+    protected void doPost(HttpServletRequest request,
             HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -40,14 +39,10 @@ public class AddEquipmentServlet extends HttpServlet {
                     request.getParameter(
                             "brandModel");
 
-            int quantity =
+            int totalQuantity =
                     Integer.parseInt(
                             request.getParameter(
-                                    "quantity"));
-
-            String equipmentStatus =
-                    request.getParameter(
-                            "equipmentStatus");
+                                    "totalQuantity"));
 
             Part imagePart =
                     request.getPart(
@@ -62,7 +57,7 @@ public class AddEquipmentServlet extends HttpServlet {
                             "_");
 
             String uploadPath =
-                    "C:\\Users\\saf\\Documents\\NetBeansProjectss\\Java-Enterprise\\Documents\\NetBeansProjects\\groupProject\\web\\uploads";
+                    "C:\\Users\\haikalriez\\Documents\\NetBeansProjects\\groupProject\\web\\uploads";
 
             File uploadDir =
                     new File(uploadPath);
@@ -70,6 +65,7 @@ public class AddEquipmentServlet extends HttpServlet {
             if (!uploadDir.exists()) {
 
                 uploadDir.mkdirs();
+
             }
 
             String filePath =
@@ -78,7 +74,7 @@ public class AddEquipmentServlet extends HttpServlet {
                     + fileName;
 
             System.out.println(
-                    "Saving Image To: "
+                    "Saving Image To : "
                     + filePath);
 
             InputStream input =
@@ -98,11 +94,17 @@ public class AddEquipmentServlet extends HttpServlet {
             equipment.setBrandModel(
                     brandModel);
 
-            equipment.setQuantity(
-                    quantity);
+            equipment.setTotalQuantity(
+                    totalQuantity);
 
-            equipment.setEquipmentStatus(
-                    equipmentStatus);
+            equipment.setAvailableQuantity(
+                    totalQuantity);
+
+            equipment.setMaintenanceQuantity(
+                    0);
+
+            equipment.setDamagedQuantity(
+                    0);
 
             equipment.setEquipmentImage(
                     fileName);
@@ -114,10 +116,12 @@ public class AddEquipmentServlet extends HttpServlet {
                     "INSERT INTO Equipment "
                   + "(equipmentName, "
                   + "brandModel, "
-                  + "quantity, "
-                  + "equipmentStatus, "
+                  + "totalQuantity, "
+                  + "availableQuantity, "
+                  + "maintenanceQuantity, "
+                  + "damagedQuantity, "
                   + "equipmentImage) "
-                  + "VALUES (?, ?, ?, ?, ?)";
+                  + "VALUES (?,?,?,?,?,?,?)";
 
             PreparedStatement ps =
                     conn.prepareStatement(
@@ -133,14 +137,22 @@ public class AddEquipmentServlet extends HttpServlet {
 
             ps.setInt(
                     3,
-                    equipment.getQuantity());
+                    equipment.getTotalQuantity());
 
-            ps.setString(
+            ps.setInt(
                     4,
-                    equipment.getEquipmentStatus());
+                    equipment.getAvailableQuantity());
+
+            ps.setInt(
+                    5,
+                    equipment.getMaintenanceQuantity());
+
+            ps.setInt(
+                    6,
+                    equipment.getDamagedQuantity());
 
             ps.setString(
-                    5,
+                    7,
                     equipment.getEquipmentImage());
 
             ps.executeUpdate();
@@ -148,15 +160,19 @@ public class AddEquipmentServlet extends HttpServlet {
             conn.close();
 
             response.sendRedirect(
-                    "admin/addEquipment.jsp?success=1");
+                    request.getContextPath()
+                    + "/admin/addEquipment.jsp?success=1");
 
         } catch (Exception e) {
 
             e.printStackTrace();
 
             response.getWriter().println(
-                    "Upload Error: "
+                    "Upload Error : "
                     + e.getMessage());
+
         }
+
     }
+
 }

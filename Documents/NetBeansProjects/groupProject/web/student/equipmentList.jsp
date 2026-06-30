@@ -1,2 +1,273 @@
-<%@page contentType="text/html" pageEncoding="UTF-8"%><%@page import="java.util.ArrayList"%><%@page import="com.bean.equipmentBean"%><% request.setAttribute("pageTitle","Available Equipment"); request.setAttribute("pageSubtitle","Search available equipment and submit loan requests."); ArrayList<equipmentBean> equipmentList=(ArrayList<equipmentBean>)request.getAttribute("equipmentList"); %>
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Equipment List</title><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet"><link href="<%=request.getContextPath()%>/assets/css/student.css" rel="stylesheet"></head><body class="student-ui-body"><div class="student-shell"><jsp:include page="layout/sidebar.jsp"/><div class="student-main"><jsp:include page="layout/topbar.jsp"/><main class="student-content"><div class="student-card card mb-4"><div class="card-body"><form action="<%=request.getContextPath()%>/equipmentList" method="get"><div class="row g-2"><div class="col-md-9"><input class="form-control" type="text" name="keyword" placeholder="Search equipment..." value="<%= request.getAttribute("keyword")==null ? "" : request.getAttribute("keyword") %>"></div><div class="col-md-3 d-flex gap-2"><input class="btn btn-student-primary flex-fill" type="submit" value="Search"><a class="btn btn-student-soft" href="<%=request.getContextPath()%>/equipmentList">Reset</a></div></div></form></div></div><div class="student-card card"><div class="card-header">Equipment Records</div><div class="card-body p-0"><div class="table-responsive"><table class="table table-student table-hover"><thead><tr><th>ID</th><th>Equipment</th><th>Brand / Model</th><th>Quantity</th><th>Status</th><th>Image</th><th>Action</th></tr></thead><tbody><% if(equipmentList!=null){ if(equipmentList.isEmpty()){ %><tr><td colspan="7"><div class="student-empty">No equipment found.</div></td></tr><% } for(equipmentBean equipment:equipmentList){ %><tr><td><%=equipment.getEquipmentID()%></td><td class="fw-bold"><%=equipment.getEquipmentName()%></td><td><%=equipment.getBrandModel()%></td><td><%=equipment.getQuantity()%></td><td><span class="badge badge-student-success rounded-pill"><%=equipment.getEquipmentStatus()%></span></td><td><img class="student-thumb" src="<%=request.getContextPath()%>/uploads/<%=equipment.getEquipmentImage()%>"></td><td><a class="btn btn-sm btn-student-primary" href="<%=request.getContextPath()%>/BorrowEquipmentPageServlet?equipmentID=<%=equipment.getEquipmentID()%>">Borrow</a></td></tr><% }} %></tbody></table></div></div></div></main></div></div><script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script></body></html>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page import="java.util.ArrayList"%>
+<%@page import="com.bean.equipmentBean"%>
+
+<%
+request.setAttribute("pageTitle","Available Equipment");
+request.setAttribute("pageSubtitle","Search available equipment and submit loan requests.");
+
+ArrayList<equipmentBean> equipmentList =
+(ArrayList<equipmentBean>)
+request.getAttribute("equipmentList");
+%>
+
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>Equipment List</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet">
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      rel="stylesheet">
+
+<link href="<%=request.getContextPath()%>/assets/css/student.css"
+      rel="stylesheet">
+
+</head>
+
+<body class="student-ui-body">
+
+<div class="student-shell">
+
+<jsp:include page="layout/sidebar.jsp"/>
+
+<div class="student-main">
+
+<jsp:include page="layout/topbar.jsp"/>
+
+<main class="student-content">
+
+<div class="student-card card mb-4">
+
+<div class="card-body">
+
+<form action="<%=request.getContextPath()%>/equipmentList"
+      method="get">
+
+<div class="row g-2">
+
+<div class="col-md-9">
+
+<input class="form-control"
+       type="text"
+       name="keyword"
+       placeholder="Search equipment..."
+       value="<%= request.getAttribute("keyword")==null ? "" : request.getAttribute("keyword") %>">
+
+</div>
+
+<div class="col-md-3 d-flex gap-2">
+
+<input class="btn btn-student-primary flex-fill"
+       type="submit"
+       value="Search">
+
+<a class="btn btn-student-soft"
+   href="<%=request.getContextPath()%>/equipmentList">
+
+Reset
+
+</a>
+
+</div>
+
+</div>
+
+</form>
+
+</div>
+
+</div>
+
+<div class="student-card card">
+
+<div class="card-header">
+
+Equipment Records
+
+</div>
+
+<div class="card-body p-0">
+
+<div class="table-responsive">
+
+<table class="table table-student table-hover">
+
+<thead>
+
+<tr>
+
+<th>ID</th>
+
+<th>Equipment</th>
+
+<th>Brand / Model</th>
+
+<th>Total</th>
+
+<th>Available</th>
+
+<th>Image</th>
+
+<th>Action</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+<%
+
+if(equipmentList!=null){
+
+if(equipmentList.isEmpty()){
+
+%>
+
+<tr>
+
+<td colspan="7">
+
+<div class="student-empty">
+
+No equipment found.
+
+</div>
+
+</td>
+
+</tr>
+
+<%
+
+}
+
+for(equipmentBean equipment : equipmentList){
+
+%>
+
+<tr>
+
+<td>
+
+<%= equipment.getEquipmentID() %>
+
+</td>
+
+<td class="fw-bold">
+
+<%= equipment.getEquipmentName() %>
+
+</td>
+
+<td>
+
+<%= equipment.getBrandModel() %>
+
+</td>
+
+<td>
+
+<span class="badge bg-dark">
+
+<%= equipment.getTotalQuantity() %>
+
+</span>
+
+</td>
+
+<td>
+
+<span class="badge bg-success">
+
+<%= equipment.getAvailableQuantity() %>
+
+</span>
+
+</td>
+
+<td>
+
+<img class="student-thumb"
+     src="<%=request.getContextPath()%>/uploads/<%=equipment.getEquipmentImage()%>">
+
+</td>
+
+<td>
+
+<%
+
+if(equipment.getAvailableQuantity()>0){
+
+%>
+
+<a class="btn btn-sm btn-student-primary"
+   href="<%=request.getContextPath()%>/BorrowEquipmentPageServlet?equipmentID=<%=equipment.getEquipmentID()%>">
+
+Borrow
+
+</a>
+
+<%
+
+}else{
+
+%>
+
+<button class="btn btn-sm btn-secondary"
+        disabled>
+
+Out of Stock
+
+</button>
+
+<%
+
+}
+
+%>
+
+</td>
+
+</tr>
+
+<%
+
+}
+
+}
+
+%>
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+</main>
+
+</div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+</html>

@@ -23,8 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 public class UpdateEquipmentServlet extends HttpServlet {
 
     @Override
-    protected void doPost(
-            HttpServletRequest request,
+    protected void doPost(HttpServletRequest request,
             HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -43,18 +42,52 @@ public class UpdateEquipmentServlet extends HttpServlet {
                     request.getParameter(
                             "brandModel");
 
-            int quantity =
+            int totalQuantity =
                     Integer.parseInt(
                             request.getParameter(
-                                    "quantity"));
+                                    "totalQuantity"));
 
-            String equipmentStatus =
-                    request.getParameter(
-                            "equipmentStatus");
+            int availableQuantity =
+                    Integer.parseInt(
+                            request.getParameter(
+                                    "availableQuantity"));
+
+            int maintenanceQuantity =
+                    Integer.parseInt(
+                            request.getParameter(
+                                    "maintenanceQuantity"));
+
+            int damagedQuantity =
+                    Integer.parseInt(
+                            request.getParameter(
+                                    "damagedQuantity"));
 
             String equipmentImage =
                     request.getParameter(
                             "equipmentImage");
+
+            // Validation
+
+            if (availableQuantity
+                    + maintenanceQuantity
+                    + damagedQuantity
+                    != totalQuantity) {
+
+                response.getWriter().println(
+
+                        "<h2>Inventory Error</h2>"
+                      + "<p>"
+                      + "Total Quantity must equal "
+                      + "Available + Maintenance + Damaged."
+                      + "</p>"
+                      + "<br>"
+                      + "<a href='javascript:history.back()'>"
+                      + "Go Back"
+                      + "</a>");
+
+                return;
+
+            }
 
             Connection conn =
                     DBConnection.getConnection();
@@ -63,14 +96,15 @@ public class UpdateEquipmentServlet extends HttpServlet {
                     "UPDATE Equipment "
                   + "SET equipmentName=?, "
                   + "brandModel=?, "
-                  + "quantity=?, "
-                  + "equipmentStatus=?, "
+                  + "totalQuantity=?, "
+                  + "availableQuantity=?, "
+                  + "maintenanceQuantity=?, "
+                  + "damagedQuantity=?, "
                   + "equipmentImage=? "
                   + "WHERE equipmentID=?";
 
             PreparedStatement ps =
-                    conn.prepareStatement(
-                            sql);
+                    conn.prepareStatement(sql);
 
             ps.setString(
                     1,
@@ -82,18 +116,26 @@ public class UpdateEquipmentServlet extends HttpServlet {
 
             ps.setInt(
                     3,
-                    quantity);
+                    totalQuantity);
 
-            ps.setString(
+            ps.setInt(
                     4,
-                    equipmentStatus);
+                    availableQuantity);
 
-            ps.setString(
+            ps.setInt(
                     5,
-                    equipmentImage);
+                    maintenanceQuantity);
 
             ps.setInt(
                     6,
+                    damagedQuantity);
+
+            ps.setString(
+                    7,
+                    equipmentImage);
+
+            ps.setInt(
+                    8,
                     equipmentID);
 
             ps.executeUpdate();
@@ -109,10 +151,13 @@ public class UpdateEquipmentServlet extends HttpServlet {
             e.printStackTrace();
 
             response.getWriter().println(
-                    "Update Error: "
+                    "Update Error : "
                     + e.getMessage());
+
         }
+
     }
+
 }
     
 
