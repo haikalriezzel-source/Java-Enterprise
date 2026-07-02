@@ -10,6 +10,8 @@ import util.DBConnection;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -28,27 +30,72 @@ public class DeleteEquipmentServlet extends HttpServlet {
             HttpServletResponse response)
             throws ServletException, IOException {
 
+        Connection conn = null;
+        PreparedStatement psCheck = null;
+        PreparedStatement psDelete = null;
+        ResultSet rs = null;
+
         try {
 
             int equipmentID =
                     Integer.parseInt(
                             request.getParameter("id"));
 
-            Connection conn =
+            conn =
                     DBConnection.getConnection();
 
-            String sql =
+            // Check if equipment has loan history
+            String checkSql =
+                    "SELECT COUNT(*) "
+                  + "FROM LoanEquipment "
+                  + "WHERE equipmentID = ?";
+
+            psCheck =
+                    conn.prepareStatement(
+                            checkSql);
+
+            psCheck.setInt(
+                    1,
+                    equipmentID);
+
+            rs =
+                    psCheck.executeQuery();
+
+            int totalLoan = 0;
+
+            if (rs.next()) {
+
+                totalLoan =
+                        rs.getInt(1);
+
+            }
+
+            if (totalLoan > 0) {
+
+                response.getWriter().println(
+
+                        "<script>"
+                      + "alert('This equipment cannot be deleted because it has loan history.');"
+                      + "window.location='ViewEquipmentServlet';"
+                      + "</script>");
+
+                return;
+
+            }
+
+            String deleteSql =
                     "DELETE FROM Equipment "
-                    + "WHERE equipmentID = ?";
+                  + "WHERE equipmentID = ?";
 
-            PreparedStatement ps =
-                    conn.prepareStatement(sql);
+            psDelete =
+                    conn.prepareStatement(
+                            deleteSql);
 
-            ps.setInt(1, equipmentID);
+            psDelete.setInt(
+                    1,
+                    equipmentID);
 
-            ps.executeUpdate();
-
-            conn.close();
+            psDelete.executeUpdate();
 
             response.sendRedirect(
                     "ViewEquipmentServlet");
@@ -58,8 +105,34 @@ public class DeleteEquipmentServlet extends HttpServlet {
             e.printStackTrace();
 
             response.getWriter().println(
-                    "Delete Error: "
-                    + e.getMessage());
+
+                    "Delete Error : "
+                  + e.getMessage());
+
+        } finally {
+
+            try {
+
+                if (rs != null)
+                    rs.close();
+
+                if (psCheck != null)
+                    psCheck.close();
+
+                if (psDelete != null)
+                    psDelete.close();
+
+                if (conn != null)
+                    conn.close();
+
+            } catch (Exception e) {
+
+                e.printStackTrace();
+
+            }
+
         }
+
     }
+
 }

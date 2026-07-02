@@ -10,6 +10,8 @@ import util.DBConnection;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -28,27 +30,73 @@ public class DeleteFacilityServlet extends HttpServlet {
             HttpServletResponse response)
             throws ServletException, IOException {
 
+        Connection conn = null;
+        PreparedStatement psCheck = null;
+        PreparedStatement psDelete = null;
+        ResultSet rs = null;
+
         try {
 
-            int equipmentID =
+            int facilityID =
                     Integer.parseInt(
                             request.getParameter("id"));
 
-            Connection conn =
+            conn =
                     DBConnection.getConnection();
 
-            String sql =
+            // Check whether the facility has booking history
+            String checkSql =
+                    "SELECT COUNT(*) "
+                  + "FROM FacilityBooking "
+                  + "WHERE facilityID = ?";
+
+            psCheck =
+                    conn.prepareStatement(
+                            checkSql);
+
+            psCheck.setInt(
+                    1,
+                    facilityID);
+
+            rs =
+                    psCheck.executeQuery();
+
+            int totalBooking = 0;
+
+            if (rs.next()) {
+
+                totalBooking =
+                        rs.getInt(1);
+
+            }
+
+            if (totalBooking > 0) {
+
+                response.getWriter().println(
+
+                        "<script>"
+                      + "alert('This facility cannot be deleted because it has booking history.');"
+                      + "window.location='ViewFacilityServlet';"
+                      + "</script>");
+
+                return;
+
+            }
+
+            // Delete facility
+            String deleteSql =
                     "DELETE FROM Facility "
-                    + "WHERE facilityID = ?";
+                  + "WHERE facilityID = ?";
 
-            PreparedStatement ps =
-                    conn.prepareStatement(sql);
+            psDelete =
+                    conn.prepareStatement(
+                            deleteSql);
 
-            ps.setInt(1, equipmentID);
+            psDelete.setInt(
+                    1,
+                    facilityID);
 
-            ps.executeUpdate();
-
-            conn.close();
+            psDelete.executeUpdate();
 
             response.sendRedirect(
                     "ViewFacilityServlet");
@@ -58,8 +106,33 @@ public class DeleteFacilityServlet extends HttpServlet {
             e.printStackTrace();
 
             response.getWriter().println(
-                    "Delete Error: "
-                    + e.getMessage());
+                    "Delete Error : "
+                  + e.getMessage());
+
+        } finally {
+
+            try {
+
+                if (rs != null)
+                    rs.close();
+
+                if (psCheck != null)
+                    psCheck.close();
+
+                if (psDelete != null)
+                    psDelete.close();
+
+                if (conn != null)
+                    conn.close();
+
+            } catch (Exception e) {
+
+                e.printStackTrace();
+
+            }
+
         }
+
     }
+
 }
