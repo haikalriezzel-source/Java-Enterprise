@@ -1,12 +1,119 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Add Facility</title><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet"><link href="<%=request.getContextPath()%>/assets/css/admin.css" rel="stylesheet"></head>
-<body class="admin-ui-body"><jsp:include page="layout/topbar.jsp" />
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Facility</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+    <link href="<%=request.getContextPath()%>/assets/css/admin.css" rel="stylesheet">
+</head>
+
+<body class="admin-ui-body">
+
+<jsp:include page="layout/topbar.jsp" />
+
 <main class="admin-ui-main">
-<div class="admin-page-header"><div><h1 class="admin-page-title">Add Facility</h1><p class="admin-page-subtitle">Create a new facility record with schedule and image.</p></div><a href="<%= request.getContextPath() %>/dashboardAdmin" class="btn btn-admin-soft"><i class="fa-solid fa-arrow-left me-2"></i>Dashboard</a></div>
-<div class="row justify-content-center"><div class="col-12 col-lg-8">
-<% if(request.getParameter("success") != null){ %><div class="alert alert-success rounded-4"><i class="fa-solid fa-circle-check me-2"></i>Facility Added Successfully.</div><% } %>
-<div class="admin-card card"><div class="card-header"><i class="fa-solid fa-building me-2 text-primary"></i>Facility Details</div><div class="card-body p-4">
-<form action="<%= request.getContextPath() %>/AddFacilityServlet" method="post" enctype="multipart/form-data">
-<div class="row g-3"><div class="col-md-6"><label class="form-label">Facility Name</label><input class="form-control" type="text" name="facilityName" required></div><div class="col-md-6"><label class="form-label">Location</label><input class="form-control" type="text" name="location"></div><div class="col-md-4"><label class="form-label">Capacity</label><input class="form-control" type="number" name="capacity" required></div><div class="col-md-4"><label class="form-label">Open Time</label><input class="form-control" type="time" name="openTime" required></div><div class="col-md-4"><label class="form-label">Close Time</label><input class="form-control" type="time" name="closeTime" required></div><div class="col-md-6"><label class="form-label">Status</label><select class="form-select" name="facilityStatus"><option value="Available">Available</option><option value="Unavailable">Unavailable</option></select></div><div class="col-md-6"><label class="form-label">Facility Image</label><input class="form-control" type="file" name="facilityImage" accept="image/*" required></div></div>
-<div class="d-flex justify-content-end gap-2 mt-4"><a class="btn btn-outline-secondary" href="<%= request.getContextPath() %>/ViewFacilityServlet">Cancel</a><button class="btn btn-admin-primary" type="submit"><i class="fa-solid fa-plus me-2"></i>Add Facility</button></div>
-</form></div></div></div></div></main><script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script></body></html>
+
+    <div class="admin-page-header">
+        <div>
+            <h1 class="admin-page-title">Add Facility</h1>
+            <p class="admin-page-subtitle">Create a new facility record with schedule and image.</p>
+        </div>
+
+        <a href="<%= request.getContextPath() %>/dashboardAdmin" class="btn btn-admin-soft">
+            <i class="fa-solid fa-arrow-left me-2"></i>Dashboard
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-8">
+
+            <% if(request.getParameter("success") != null){ %>
+                <div class="alert alert-success rounded-4">
+                    <i class="fa-solid fa-circle-check me-2"></i>
+                    Facility Added Successfully.
+                </div>
+            <% } %>
+
+            <div class="admin-card card">
+                <div class="card-header">
+                    <i class="fa-solid fa-building me-2 text-primary"></i>
+                    Facility Details
+                </div>
+
+                <div class="card-body p-4">
+
+                    <form action="<%= request.getContextPath() %>/AddFacilityServlet"
+                          method="post"
+                          enctype="multipart/form-data">
+
+                        <div class="row g-3">
+
+                            <div class="col-md-6">
+                                <label class="form-label">Facility Name</label>
+                                <input class="form-control" type="text" name="facilityName" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Location</label>
+                                <input class="form-control" type="text" name="location">
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">Capacity</label>
+                                <input class="form-control" type="number" name="capacity" required>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">Open Time</label>
+                                <input class="form-control" type="time" name="openTime" required>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">Close Time</label>
+                                <input class="form-control" type="time" name="closeTime" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Status</label>
+                                <select class="form-select" name="facilityStatus">
+                                    <option value="Available">Available</option>
+                                    <option value="Unavailable">Unavailable</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Facility Image</label>
+                                <input class="form-control" type="file" name="facilityImage" accept="image/*" required>
+                            </div>
+
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <a class="btn btn-outline-secondary"
+                               href="<%= request.getContextPath() %>/ViewFacilityServlet">
+                                Cancel
+                            </a>
+
+                            <button class="btn btn-admin-primary" type="submit">
+                                <i class="fa-solid fa-plus me-2"></i>
+                                Add Facility
+                            </button>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,2 +1,171 @@
-<%@page contentType="text/html" pageEncoding="UTF-8"%><%@page import="com.bean.student"%><% request.setAttribute("pageTitle","Edit Student Profile"); request.setAttribute("pageSubtitle","Update your profile and contact information."); student student=(student)request.getAttribute("student"); %>
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Edit Student Profile</title><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet"><link href="<%=request.getContextPath()%>/assets/css/student.css" rel="stylesheet"></head><body class="student-ui-body"><div class="student-shell"><jsp:include page="layout/sidebar.jsp"/><div class="student-main"><jsp:include page="layout/topbar.jsp"/><main class="student-content"><div class="row justify-content-center"><div class="col-lg-8"><div class="student-card card"><div class="card-header"><i class="fa-regular fa-user me-2 text-primary"></i>Student Details</div><div class="card-body p-4"><form action="<%= request.getContextPath() %>/UpdateStudentProfileServlet" method="post"><div class="row g-3"><div class="col-md-6"><label class="form-label">Student ID</label><input class="form-control" type="text" name="studentID" value="<%= student.getStudentID() %>" readonly></div><div class="col-md-6"><label class="form-label">Student Name</label><input class="form-control" type="text" name="studentName" value="<%= student.getStudentName() %>" required></div><div class="col-md-6"><label class="form-label">Password</label><div class="input-group"><input class="form-control" type="password" id="password" name="password" value="<%= student.getPassword() %>" required><button class="btn btn-student-soft" type="button" onclick="togglePassword()"><i class="fa-regular fa-eye"></i></button></div></div><div class="col-md-6"><label class="form-label">Date of Birth</label><input class="form-control" type="date" name="studentDOB" value="<%= student.getStudentDOB() %>" required></div><div class="col-md-6"><label class="form-label">Programme</label><input class="form-control" type="text" value="<%= student.getProgramme() %>" readonly><input type="hidden" name="programme" value="<%= student.getProgramme() %>"></div><div class="col-md-6"><label class="form-label">Phone Number</label><input class="form-control" type="text" name="phoneNumber" value="<%= student.getPhoneNumber() %>" required></div></div><div class="d-flex justify-content-end gap-2 mt-4"><a class="btn btn-student-soft" href="<%= request.getContextPath() %>/studentDashboard">Back To Dashboard</a><button class="btn btn-student-primary" type="submit">Update Profile</button></div></form></div></div></div></div></main></div></div><script>function togglePassword(){var password=document.getElementById('password');password.type=(password.type==='password')?'text':'password';}</script><script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script></body></html>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page import="com.bean.student"%>
+
+<%
+    request.setAttribute("pageTitle", "Edit Student Profile");
+    request.setAttribute("pageSubtitle", "Update your profile and contact information.");
+
+    student student = (student) request.getAttribute("student");
+%>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Student Profile</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+    <link href="<%=request.getContextPath()%>/assets/css/student.css" rel="stylesheet">
+</head>
+
+<body class="student-ui-body">
+
+<div class="student-shell">
+
+    <!-- SIDEBAR -->
+    <jsp:include page="layout/sidebar.jsp"/>
+
+    <div class="student-main">
+
+        <!-- TOPBAR -->
+        <jsp:include page="layout/topbar.jsp"/>
+
+        <main class="student-content">
+
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+
+                    <div class="student-card card">
+
+                        <!-- HEADER -->
+                        <div class="card-header">
+                            <i class="fa-regular fa-user me-2 text-primary"></i>
+                            Student Details
+                        </div>
+
+                        <div class="card-body p-4">
+
+                            <form action="<%= request.getContextPath() %>/UpdateStudentProfileServlet"
+                                  method="post">
+
+                                <div class="row g-3">
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">Student ID</label>
+                                        <input class="form-control"
+                                               type="text"
+                                               name="studentID"
+                                               value="<%= student.getStudentID() %>"
+                                               readonly>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">Student Name</label>
+                                        <input class="form-control"
+                                               type="text"
+                                               name="studentName"
+                                               value="<%= student.getStudentName() %>"
+                                               required>
+                                    </div>
+
+                                    <!-- PASSWORD -->
+                                    <div class="col-md-6">
+                                        <label class="form-label">Password</label>
+
+                                        <div class="input-group">
+
+                                            <input class="form-control"
+                                                   type="password"
+                                                   id="password"
+                                                   name="password"
+                                                   value="<%= student.getPassword() %>"
+                                                   required>
+
+                                            <button class="btn btn-student-soft"
+                                                    type="button"
+                                                    onclick="togglePassword()">
+
+                                                <i class="fa-regular fa-eye"></i>
+
+                                            </button>
+
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">Date of Birth</label>
+                                        <input class="form-control"
+                                               type="date"
+                                               name="studentDOB"
+                                               value="<%= student.getStudentDOB() %>"
+                                               required>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">Programme</label>
+
+                                        <input class="form-control"
+                                               type="text"
+                                               value="<%= student.getProgramme() %>"
+                                               readonly>
+
+                                        <input type="hidden"
+                                               name="programme"
+                                               value="<%= student.getProgramme() %>">
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="form-label">Phone Number</label>
+                                        <input class="form-control"
+                                               type="text"
+                                               name="phoneNumber"
+                                               value="<%= student.getPhoneNumber() %>"
+                                               required>
+                                    </div>
+
+                                </div>
+
+                                <!-- ACTIONS -->
+                                <div class="d-flex justify-content-end gap-2 mt-4">
+
+                                    <a class="btn btn-student-soft"
+                                       href="<%= request.getContextPath() %>/studentDashboard">
+                                        Back To Dashboard
+                                    </a>
+
+                                    <button class="btn btn-student-primary" type="submit">
+                                        Update Profile
+                                    </button>
+
+                                </div>
+
+                            </form>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </main>
+
+    </div>
+
+</div>
+
+<!-- SCRIPT -->
+<script>
+    function togglePassword() {
+        var password = document.getElementById('password');
+        password.type = (password.type === 'password') ? 'text' : 'password';
+    }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

@@ -1,7 +1,264 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@page import="java.util.ArrayList"%><%@page import="com.bean.LoanEquipmentBean"%>
-<% ArrayList<LoanEquipmentBean> pendingList=(ArrayList<LoanEquipmentBean>)request.getAttribute("pendingList"); ArrayList<LoanEquipmentBean> historyList=(ArrayList<LoanEquipmentBean>)request.getAttribute("historyList"); %>
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Equipment Loan Management</title><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet"><link href="<%=request.getContextPath()%>/assets/css/admin.css" rel="stylesheet"></head><body class="admin-ui-body"><jsp:include page="layout/topbar.jsp" />
-<main class="admin-ui-main"><div class="admin-page-header"><div><h1 class="admin-page-title">Equipment Loan Management</h1><p class="admin-page-subtitle">Approve or reject equipment loan requests.</p></div><a href="<%=request.getContextPath()%>/dashboardAdmin" class="btn btn-admin-soft">Dashboard</a></div><div class="admin-card admin-search-card mb-4"><form action="<%=request.getContextPath()%>/AdminLoanListServlet" method="get"><div class="row g-2"><div class="col-md-9"><input class="form-control" type="text" name="keyword" placeholder="Search Student / Equipment / Status..." value="<%= request.getAttribute("keyword")==null ? "" : request.getAttribute("keyword") %>"></div><div class="col-md-3 d-flex gap-2"><input class="btn btn-admin-primary flex-fill" type="submit" value="Search"><a class="btn btn-admin-soft" href="<%=request.getContextPath()%>/AdminLoanListServlet">Reset</a></div></div></form></div>
-<div class="admin-card card mb-4"><div class="card-header">Pending Loan Requests</div><div class="card-body p-0"><div class="table-responsive"><table class="table table-admin table-hover"><thead><tr><th>Loan ID</th><th>Student ID</th><th>Student Name</th><th>Equipment</th><th>Start Date</th><th>End Date</th><th>Quantity</th><th>Action</th></tr></thead><tbody><% if(pendingList!=null){ if(pendingList.isEmpty()){ %><tr><td colspan="8"><div class="admin-empty">No pending loan found.</div></td></tr><% } for(LoanEquipmentBean loan: pendingList){ %><tr><td><%=loan.getLoanID()%></td><td><%=loan.getStudentID()%></td><td class="fw-bold"><%=loan.getStudentName()%></td><td><%=loan.getEquipmentName()%></td><td><%=loan.getStartDate()%></td><td><%=loan.getEndDate()%></td><td><%=loan.getLoanQuantity()%></td><td><form class="admin-action-row" action="<%=request.getContextPath()%>/ApproveLoanServlet" method="post"><input type="hidden" name="loanID" value="<%=loan.getLoanID()%>"><button class="btn btn-sm btn-success" type="submit" name="action" value="Approved">Approve</button><button class="btn btn-sm btn-outline-danger" type="submit" name="action" value="Rejected">Reject</button></form></td></tr><% }} %></tbody></table></div></div></div>
-<div class="admin-card card"><div class="card-header">Loan History</div><div class="card-body p-0"><div class="table-responsive"><table class="table table-admin table-hover"><thead><tr><th>Loan ID</th><th>Student ID</th><th>Student Name</th><th>Equipment</th><th>Start Date</th><th>End Date</th><th>Quantity</th><th>Status</th></tr></thead><tbody><% if(historyList!=null){ if(historyList.isEmpty()){ %><tr><td colspan="8"><div class="admin-empty">No loan history found.</div></td></tr><% } for(LoanEquipmentBean loan: historyList){ String st=loan.getLoanStatus(); String badge="Approved".equalsIgnoreCase(st)?"badge-admin-success":("Rejected".equalsIgnoreCase(st)?"badge-admin-danger":"badge-admin-warning"); %><tr><td><%=loan.getLoanID()%></td><td><%=loan.getStudentID()%></td><td class="fw-bold"><%=loan.getStudentName()%></td><td><%=loan.getEquipmentName()%></td><td><%=loan.getStartDate()%></td><td><%=loan.getEndDate()%></td><td><%=loan.getLoanQuantity()%></td><td><span class="badge <%=badge%> rounded-pill"><%=loan.getLoanStatus()%></span></td></tr><% }} %></tbody></table></div></div></div></main><script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script></body></html>
+<%@page import="java.util.ArrayList"%>
+<%@page import="com.bean.LoanEquipmentBean"%>
+
+<%
+    ArrayList<LoanEquipmentBean> pendingList =
+        (ArrayList<LoanEquipmentBean>) request.getAttribute("pendingList");
+
+    ArrayList<LoanEquipmentBean> historyList =
+        (ArrayList<LoanEquipmentBean>) request.getAttribute("historyList");
+%>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equipment Loan Management</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+    <link href="<%=request.getContextPath()%>/assets/css/admin.css" rel="stylesheet">
+</head>
+
+<body class="admin-ui-body">
+
+<jsp:include page="layout/topbar.jsp" />
+
+<main class="admin-ui-main">
+
+    <!-- HEADER -->
+    <div class="admin-page-header">
+
+        <div>
+            <h1 class="admin-page-title">Equipment Loan Management</h1>
+            <p class="admin-page-subtitle">
+                Approve or reject equipment loan requests.
+            </p>
+        </div>
+
+        <a href="<%=request.getContextPath()%>/dashboardAdmin"
+           class="btn btn-admin-soft">
+            Dashboard
+        </a>
+
+    </div>
+
+    <!-- SEARCH -->
+    <div class="admin-card admin-search-card mb-4">
+
+        <form action="<%=request.getContextPath()%>/AdminLoanListServlet" method="get">
+
+            <div class="row g-2">
+
+                <div class="col-md-9">
+                    <input class="form-control"
+                           type="text"
+                           name="keyword"
+                           placeholder="Search Student / Equipment / Status..."
+                           value="<%= request.getAttribute("keyword")==null ? "" : request.getAttribute("keyword") %>">
+                </div>
+
+                <div class="col-md-3 d-flex gap-2">
+                    <input class="btn btn-admin-primary flex-fill" type="submit" value="Search">
+
+                    <a class="btn btn-admin-soft"
+                       href="<%=request.getContextPath()%>/AdminLoanListServlet">
+                        Reset
+                    </a>
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+    <!-- PENDING -->
+    <div class="admin-card card mb-4">
+
+        <div class="card-header">
+            Pending Loan Requests
+        </div>
+
+        <div class="card-body p-0">
+
+            <div class="table-responsive">
+
+                <table class="table table-admin table-hover">
+
+                    <thead>
+                        <tr>
+                            <th>Loan ID</th>
+                            <th>Student ID</th>
+                            <th>Student Name</th>
+                            <th>Equipment</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Quantity</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        <%
+                            if (pendingList != null) {
+                                if (pendingList.isEmpty()) {
+                        %>
+                            <tr>
+                                <td colspan="8">
+                                    <div class="admin-empty">
+                                        No pending loan found.
+                                    </div>
+                                </td>
+                            </tr>
+                        <%
+                                }
+
+                                for (LoanEquipmentBean loan : pendingList) {
+                        %>
+
+                            <tr>
+                                <td><%= loan.getLoanID() %></td>
+                                <td><%= loan.getStudentID() %></td>
+                                <td class="fw-bold"><%= loan.getStudentName() %></td>
+                                <td><%= loan.getEquipmentName() %></td>
+                                <td><%= loan.getStartDate() %></td>
+                                <td><%= loan.getEndDate() %></td>
+                                <td><%= loan.getLoanQuantity() %></td>
+
+                                <td>
+                                    <form class="admin-action-row"
+                                          action="<%=request.getContextPath()%>/ApproveLoanServlet"
+                                          method="post">
+
+                                        <input type="hidden" name="loanID" value="<%=loan.getLoanID()%>">
+
+                                        <button class="btn btn-sm btn-success"
+                                                type="submit"
+                                                name="action"
+                                                value="Approved">
+                                            Approve
+                                        </button>
+
+                                        <button class="btn btn-sm btn-outline-danger"
+                                                type="submit"
+                                                name="action"
+                                                value="Rejected">
+                                            Reject
+                                        </button>
+
+                                    </form>
+                                </td>
+
+                            </tr>
+
+                        <%
+                                }
+                            }
+                        %>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- HISTORY -->
+    <div class="admin-card card">
+
+        <div class="card-header">
+            Loan History
+        </div>
+
+        <div class="card-body p-0">
+
+            <div class="table-responsive">
+
+                <table class="table table-admin table-hover">
+
+                    <thead>
+                        <tr>
+                            <th>Loan ID</th>
+                            <th>Student ID</th>
+                            <th>Student Name</th>
+                            <th>Equipment</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Quantity</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        <%
+                            if (historyList != null) {
+                                if (historyList.isEmpty()) {
+                        %>
+                            <tr>
+                                <td colspan="8">
+                                    <div class="admin-empty">
+                                        No loan history found.
+                                    </div>
+                                </td>
+                            </tr>
+                        <%
+                                }
+
+                                for (LoanEquipmentBean loan : historyList) {
+
+                                    String st = loan.getLoanStatus();
+
+                                    String badge =
+                                            "Approved".equalsIgnoreCase(st)
+                                                    ? "badge-admin-success"
+                                                    : ("Rejected".equalsIgnoreCase(st)
+                                                        ? "badge-admin-danger"
+                                                        : "badge-admin-warning");
+                        %>
+
+                            <tr>
+                                <td><%= loan.getLoanID() %></td>
+                                <td><%= loan.getStudentID() %></td>
+                                <td class="fw-bold"><%= loan.getStudentName() %></td>
+                                <td><%= loan.getEquipmentName() %></td>
+                                <td><%= loan.getStartDate() %></td>
+                                <td><%= loan.getEndDate() %></td>
+                                <td><%= loan.getLoanQuantity() %></td>
+
+                                <td>
+                                    <span class="badge <%= badge %> rounded-pill">
+                                        <%= loan.getLoanStatus() %>
+                                    </span>
+                                </td>
+                            </tr>
+
+                        <%
+                                }
+                            }
+                        %>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

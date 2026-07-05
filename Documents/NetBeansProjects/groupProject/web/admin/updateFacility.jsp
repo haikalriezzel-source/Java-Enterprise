@@ -1,6 +1,183 @@
 <%@page import="java.sql.*"%>
 <%@page import="util.DBConnection"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<% int facilityID = Integer.parseInt(request.getParameter("id")); Connection conn = DBConnection.getConnection(); String sql = "SELECT * FROM Facility WHERE facilityID=?"; PreparedStatement ps = conn.prepareStatement(sql); ps.setInt(1, facilityID); ResultSet rs = ps.executeQuery(); rs.next(); %>
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Update Facility</title><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet"><link href="<%=request.getContextPath()%>/assets/css/admin.css" rel="stylesheet"></head><body class="admin-ui-body"><jsp:include page="layout/topbar.jsp" />
-<main class="admin-ui-main"><div class="admin-page-header"><div><h1 class="admin-page-title">Update Facility</h1><p class="admin-page-subtitle">Edit facility details, operating hours, and image reference.</p></div><a href="<%= request.getContextPath() %>/ViewFacilityServlet" class="btn btn-admin-soft"><i class="fa-solid fa-arrow-left me-2"></i>Back</a></div><div class="row justify-content-center"><div class="col-12 col-lg-8"><div class="admin-card card"><div class="card-header"><i class="fa-solid fa-building me-2 text-primary"></i>Facility Details</div><div class="card-body p-4"><form action="<%= request.getContextPath() %>/UpdateFacilityServlet" method="post"><input type="hidden" name="facilityID" value="<%= rs.getInt("facilityID") %>"><div class="row g-3"><div class="col-md-6"><label class="form-label">Facility Name</label><input class="form-control" type="text" name="facilityName" value="<%= rs.getString("facilityName") %>" required></div><div class="col-md-6"><label class="form-label">Location</label><input class="form-control" type="text" name="location" value="<%= rs.getString("location") %>"></div><div class="col-md-4"><label class="form-label">Capacity</label><input class="form-control" type="number" name="capacity" value="<%= rs.getInt("capacity") %>" required></div><div class="col-md-4"><label class="form-label">Open Time</label><input class="form-control" type="time" name="openTime" value="<%= rs.getTime("openTime").toString().substring(0,5) %>" required></div><div class="col-md-4"><label class="form-label">Close Time</label><input class="form-control" type="time" name="closeTime" value="<%= rs.getTime("closeTime").toString().substring(0,5) %>" required></div><div class="col-md-6"><label class="form-label">Status</label><select class="form-select" name="facilityStatus"><option value="Available" <%= rs.getString("facilityStatus").equals("Available") ? "selected" : "" %>>Available</option><option value="Unavailable" <%= rs.getString("facilityStatus").equals("Unavailable") ? "selected" : "" %>>Unavailable</option></select></div><div class="col-md-6"><label class="form-label">Facility Image</label><input class="form-control" type="text" name="facilityImage" value="<%= rs.getString("facilityImage") %>"></div></div><div class="d-flex justify-content-end gap-2 mt-4"><a class="btn btn-outline-secondary" href="<%= request.getContextPath() %>/ViewFacilityServlet">Cancel</a><button class="btn btn-admin-primary" type="submit"><i class="fa-solid fa-floppy-disk me-2"></i>Update Facility</button></div></form></div></div></div></div></main><script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script></body></html><% conn.close(); %>
+
+<%
+    int facilityID = Integer.parseInt(request.getParameter("id"));
+
+    Connection conn = DBConnection.getConnection();
+
+    String sql = "SELECT * FROM Facility WHERE facilityID=?";
+    PreparedStatement ps = conn.prepareStatement(sql);
+    ps.setInt(1, facilityID);
+
+    ResultSet rs = ps.executeQuery();
+    rs.next();
+%>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Facility</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+    <link href="<%=request.getContextPath()%>/assets/css/admin.css" rel="stylesheet">
+</head>
+
+<body class="admin-ui-body">
+
+<jsp:include page="layout/topbar.jsp" />
+
+<main class="admin-ui-main">
+
+    <!-- HEADER -->
+    <div class="admin-page-header">
+
+        <div>
+            <h1 class="admin-page-title">Update Facility</h1>
+            <p class="admin-page-subtitle">
+                Edit facility details, operating hours, and image reference.
+            </p>
+        </div>
+
+        <a href="<%= request.getContextPath() %>/ViewFacilityServlet"
+           class="btn btn-admin-soft">
+            <i class="fa-solid fa-arrow-left me-2"></i>
+            Back
+        </a>
+
+    </div>
+
+    <!-- FORM -->
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-8">
+
+            <div class="admin-card card">
+
+                <div class="card-header">
+                    <i class="fa-solid fa-building me-2 text-primary"></i>
+                    Facility Details
+                </div>
+
+                <div class="card-body p-4">
+
+                    <form action="<%= request.getContextPath() %>/UpdateFacilityServlet"
+                          method="post">
+
+                        <input type="hidden"
+                               name="facilityID"
+                               value="<%= rs.getInt("facilityID") %>">
+
+                        <div class="row g-3">
+
+                            <div class="col-md-6">
+                                <label class="form-label">Facility Name</label>
+                                <input class="form-control"
+                                       type="text"
+                                       name="facilityName"
+                                       value="<%= rs.getString("facilityName") %>"
+                                       required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Location</label>
+                                <input class="form-control"
+                                       type="text"
+                                       name="location"
+                                       value="<%= rs.getString("location") %>">
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">Capacity</label>
+                                <input class="form-control"
+                                       type="number"
+                                       name="capacity"
+                                       value="<%= rs.getInt("capacity") %>"
+                                       required>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">Open Time</label>
+                                <input class="form-control"
+                                       type="time"
+                                       name="openTime"
+                                       value="<%= rs.getTime("openTime").toString().substring(0,5) %>"
+                                       required>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">Close Time</label>
+                                <input class="form-control"
+                                       type="time"
+                                       name="closeTime"
+                                       value="<%= rs.getTime("closeTime").toString().substring(0,5) %>"
+                                       required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Status</label>
+
+                                <select class="form-select" name="facilityStatus">
+
+                                    <option value="Available"
+                                        <%= rs.getString("facilityStatus").equals("Available") ? "selected" : "" %>>
+                                        Available
+                                    </option>
+
+                                    <option value="Unavailable"
+                                        <%= rs.getString("facilityStatus").equals("Unavailable") ? "selected" : "" %>>
+                                        Unavailable
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Facility Image</label>
+                                <input class="form-control"
+                                       type="text"
+                                       name="facilityImage"
+                                       value="<%= rs.getString("facilityImage") %>">
+                            </div>
+
+                        </div>
+
+                        <!-- ACTIONS -->
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+
+                            <a class="btn btn-outline-secondary"
+                               href="<%= request.getContextPath() %>/ViewFacilityServlet">
+                                Cancel
+                            </a>
+
+                            <button class="btn btn-admin-primary" type="submit">
+                                <i class="fa-solid fa-floppy-disk me-2"></i>
+                                Update Facility
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
+
+<%
+    conn.close();
+%>

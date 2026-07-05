@@ -1,6 +1,292 @@
-<%@page import="java.util.ArrayList"%><%@page import="com.bean.facilityBookingBean"%><%@page contentType="text/html" pageEncoding="UTF-8"%><% request.setAttribute("pageTitle","My Facility Bookings"); request.setAttribute("pageSubtitle","Track your current and past facility bookings."); ArrayList<facilityBookingBean> activeList=(ArrayList<facilityBookingBean>)request.getAttribute("activeList"); ArrayList<facilityBookingBean> historyList=(ArrayList<facilityBookingBean>)request.getAttribute("historyList"); %>
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>My Facility Bookings</title><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet"><link href="<%=request.getContextPath()%>/assets/css/student.css" rel="stylesheet"></head><body class="student-ui-body"><div class="student-shell"><jsp:include page="layout/sidebar.jsp"/><div class="student-main"><jsp:include page="layout/topbar.jsp"/><main class="student-content">
-<div class="student-card card mb-4"><div class="card-body"><form action="<%=request.getContextPath()%>/MyFacilityBookingServlet" method="get"><div class="row g-2"><div class="col-md-9"><input class="form-control" type="text" name="keyword" placeholder="Search booking..." value="<%=request.getAttribute("keyword")==null?"":request.getAttribute("keyword")%>"></div><div class="col-md-3 d-flex gap-2"><input class="btn btn-student-primary flex-fill" type="submit" value="Search"><a class="btn btn-student-soft" href="<%=request.getContextPath()%>/MyFacilityBookingServlet">Reset</a></div></div></form></div></div>
-<div class="student-card card mb-4"><div class="card-header"><i class="fa-solid fa-calendar-check me-2 text-primary"></i>Current Facility Bookings</div><div class="card-body p-0"><div class="table-responsive"><table class="table table-student table-hover"><thead><tr><th>Booking ID</th><th>Facility Name</th><th>Booking Date</th><th>Start Time</th><th>End Time</th><th>Purpose</th><th>Participants</th><th>Status</th></tr></thead><tbody><% if(activeList!=null){ if(activeList.isEmpty()){ %><tr><td colspan="8"><div class="student-empty">No current booking found.</div></td></tr><% } for(facilityBookingBean booking:activeList){ String st=booking.getBookingStatus(); String badge="Approved".equalsIgnoreCase(st)?"badge-student-success":"badge-student-warning"; %><tr><td><span class="badge badge-student-neutral rounded-pill"><%=booking.getBookingID()%></span></td><td class="fw-bold"><%=booking.getFacilityName()%></td><td><%=booking.getBookingDate()%></td><td><%=booking.getStartTime()%></td><td><%=booking.getEndTime()%></td><td><%=booking.getPurpose()%></td><td><%=booking.getNumberOfParticipants()%></td><td><span class="badge <%=badge%> rounded-pill"><%=booking.getBookingStatus()%></span></td></tr><% }} %></tbody></table></div></div></div>
-<div class="student-card card"><div class="card-header"><i class="fa-solid fa-clock-rotate-left me-2 text-primary"></i>Booking History</div><div class="card-body p-0"><div class="table-responsive"><table class="table table-student table-hover"><thead><tr><th>Booking ID</th><th>Facility Name</th><th>Booking Date</th><th>Start Time</th><th>End Time</th><th>Purpose</th><th>Participants</th><th>Status</th></tr></thead><tbody><% if(historyList!=null){ if(historyList.isEmpty()){ %><tr><td colspan="8"><div class="student-empty">No booking history found.</div></td></tr><% } for(facilityBookingBean booking:historyList){ String st=booking.getBookingStatus(); String badge="Rejected".equalsIgnoreCase(st)?"badge-student-danger":"badge-student-info"; %><tr><td><span class="badge badge-student-neutral rounded-pill"><%=booking.getBookingID()%></span></td><td class="fw-bold"><%=booking.getFacilityName()%></td><td><%=booking.getBookingDate()%></td><td><%=booking.getStartTime()%></td><td><%=booking.getEndTime()%></td><td><%=booking.getPurpose()%></td><td><%=booking.getNumberOfParticipants()%></td><td><span class="badge <%=badge%> rounded-pill"><%=booking.getBookingStatus()%></span></td></tr><% }} %></tbody></table></div></div></div>
-</main></div></div><script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script></body></html>
+<%@page import="java.util.ArrayList"%>
+<%@page import="com.bean.facilityBookingBean"%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+
+<%
+    request.setAttribute("pageTitle", "My Facility Bookings");
+    request.setAttribute("pageSubtitle", "Track your current and past facility bookings.");
+
+    ArrayList<facilityBookingBean> activeList =
+        (ArrayList<facilityBookingBean>) request.getAttribute("activeList");
+
+    ArrayList<facilityBookingBean> historyList =
+        (ArrayList<facilityBookingBean>) request.getAttribute("historyList");
+%>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Facility Bookings</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+    <link href="<%=request.getContextPath()%>/assets/css/student.css" rel="stylesheet">
+</head>
+
+<body class="student-ui-body">
+
+<div class="student-shell">
+
+    <!-- SIDEBAR -->
+    <jsp:include page="layout/sidebar.jsp"/>
+
+    <div class="student-main">
+
+        <!-- TOPBAR -->
+        <jsp:include page="layout/topbar.jsp"/>
+
+        <main class="student-content">
+
+            <!-- SEARCH -->
+            <div class="student-card card mb-4">
+
+                <div class="card-body">
+
+                    <form action="<%=request.getContextPath()%>/MyFacilityBookingServlet" method="get">
+
+                        <div class="row g-2">
+
+                            <div class="col-md-9">
+                                <input class="form-control"
+                                       type="text"
+                                       name="keyword"
+                                       placeholder="Search booking..."
+                                       value="<%=request.getAttribute("keyword")==null ? "" : request.getAttribute("keyword")%>">
+                            </div>
+
+                            <div class="col-md-3 d-flex gap-2">
+
+                                <input class="btn btn-student-primary flex-fill"
+                                       type="submit"
+                                       value="Search">
+
+                                <a class="btn btn-student-soft"
+                                   href="<%=request.getContextPath()%>/MyFacilityBookingServlet">
+                                    Reset
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+            <!-- ACTIVE BOOKINGS -->
+            <div class="student-card card mb-4">
+
+                <div class="card-header">
+                    <i class="fa-solid fa-calendar-check me-2 text-primary"></i>
+                    Current Facility Bookings
+                </div>
+
+                <div class="card-body p-0">
+
+                    <div class="table-responsive">
+
+                        <table class="table table-student table-hover">
+
+                            <thead>
+                                <tr>
+                                    <th>Booking ID</th>
+                                    <th>Facility Name</th>
+                                    <th>Booking Date</th>
+                                    <th>Start Time</th>
+                                    <th>End Time</th>
+                                    <th>Purpose</th>
+                                    <th>Participants</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                <%
+                                    if (activeList != null) {
+
+                                        if (activeList.isEmpty()) {
+                                %>
+
+                                    <tr>
+                                        <td colspan="8">
+                                            <div class="student-empty">
+                                                No current booking found.
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                <%
+                                        }
+
+                                        for (facilityBookingBean booking : activeList) {
+
+                                            String st = booking.getBookingStatus();
+
+                                            String badge =
+                                                    "Approved".equalsIgnoreCase(st)
+                                                            ? "badge-student-success"
+                                                            : "badge-student-warning";
+                                %>
+
+                                    <tr>
+
+                                        <td>
+                                            <span class="badge badge-student-neutral rounded-pill">
+                                                <%= booking.getBookingID() %>
+                                            </span>
+                                        </td>
+
+                                        <td class="fw-bold">
+                                            <%= booking.getFacilityName() %>
+                                        </td>
+
+                                        <td><%= booking.getBookingDate() %></td>
+
+                                        <td><%= booking.getStartTime() %></td>
+
+                                        <td><%= booking.getEndTime() %></td>
+
+                                        <td><%= booking.getPurpose() %></td>
+
+                                        <td><%= booking.getNumberOfParticipants() %></td>
+
+                                        <td>
+                                            <span class="badge <%= badge %> rounded-pill">
+                                                <%= booking.getBookingStatus() %>
+                                            </span>
+                                        </td>
+
+                                    </tr>
+
+                                <%
+                                        }
+                                    }
+                                %>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- HISTORY -->
+            <div class="student-card card">
+
+                <div class="card-header">
+                    <i class="fa-solid fa-clock-rotate-left me-2 text-primary"></i>
+                    Booking History
+                </div>
+
+                <div class="card-body p-0">
+
+                    <div class="table-responsive">
+
+                        <table class="table table-student table-hover">
+
+                            <thead>
+                                <tr>
+                                    <th>Booking ID</th>
+                                    <th>Facility Name</th>
+                                    <th>Booking Date</th>
+                                    <th>Start Time</th>
+                                    <th>End Time</th>
+                                    <th>Purpose</th>
+                                    <th>Participants</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                <%
+                                    if (historyList != null) {
+
+                                        if (historyList.isEmpty()) {
+                                %>
+
+                                    <tr>
+                                        <td colspan="8">
+                                            <div class="student-empty">
+                                                No booking history found.
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                <%
+                                        }
+
+                                        for (facilityBookingBean booking : historyList) {
+
+                                            String st = booking.getBookingStatus();
+
+                                            String badge =
+                                                    "Rejected".equalsIgnoreCase(st)
+                                                            ? "badge-student-danger"
+                                                            : "badge-student-info";
+                                %>
+
+                                    <tr>
+
+                                        <td>
+                                            <span class="badge badge-student-neutral rounded-pill">
+                                                <%= booking.getBookingID() %>
+                                            </span>
+                                        </td>
+
+                                        <td class="fw-bold">
+                                            <%= booking.getFacilityName() %>
+                                        </td>
+
+                                        <td><%= booking.getBookingDate() %></td>
+
+                                        <td><%= booking.getStartTime() %></td>
+
+                                        <td><%= booking.getEndTime() %></td>
+
+                                        <td><%= booking.getPurpose() %></td>
+
+                                        <td><%= booking.getNumberOfParticipants() %></td>
+
+                                        <td>
+                                            <span class="badge <%= badge %> rounded-pill">
+                                                <%= booking.getBookingStatus() %>
+                                            </span>
+                                        </td>
+
+                                    </tr>
+
+                                <%
+                                        }
+                                    }
+                                %>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </main>
+
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

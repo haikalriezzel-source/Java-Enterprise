@@ -1,7 +1,215 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<% request.setAttribute("pageTitle","Student Dashboard"); request.setAttribute("pageSubtitle","Welcome back and manage your student services."); %>
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Student Dashboard</title><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet"><link href="<%=request.getContextPath()%>/assets/css/student.css" rel="stylesheet"></head><body class="student-ui-body"><div class="student-shell"><jsp:include page="layout/sidebar.jsp"/><div class="student-main"><jsp:include page="layout/topbar.jsp"/><main class="student-content">
-<div class="student-card card mb-4"><div class="card-body p-4"><div class="row align-items-center g-3"><div class="col-lg-8"><span class="badge badge-student-info rounded-pill mb-2">Student Portal</span><h2 class="fw-bold mb-1">Welcome, ${sessionScope.studentName}</h2><p class="student-muted mb-0">Book facilities, borrow equipment, and track your active requests.</p></div><div class="col-lg-4 text-lg-end"><a href="<%= request.getContextPath() %>/EditStudentProfileServlet" class="btn btn-student-primary"><i class="fa-regular fa-user me-2"></i>Edit Profile</a></div></div></div></div>
-<div class="row g-3 mb-4"><div class="col-md-3"><div class="student-card card h-100"><div class="card-body"><div class="student-muted small fw-bold">Total Bookings</div><h3>${totalBookings}</h3></div></div></div><div class="col-md-3"><div class="student-card card h-100"><div class="card-body"><div class="student-muted small fw-bold">Active Loans</div><h3>${activeLoans}</h3></div></div></div><div class="col-md-3"><div class="student-card card h-100"><div class="card-body"><div class="student-muted small fw-bold">Pending Requests</div><h3>${pendingRequests}</h3></div></div></div><div class="col-md-3"><div class="student-card card h-100"><div class="card-body"><div class="student-muted small fw-bold">Returned Items</div><h3>${returnedItems}</h3></div></div></div></div>
-<div class="row g-3 mb-4"><div class="col-lg-4"><div class="student-card card h-100"><div class="card-header">Profile Summary</div><div class="card-body"><p><strong>Student ID:</strong> ${studentID}</p><p><strong>Programme:</strong> ${programme}</p><p class="mb-0"><strong>Phone:</strong> ${phoneNumber}</p></div></div></div><div class="col-lg-8"><div class="row g-3"><div class="col-md-6"><a class="student-card student-action-card" href="<%= request.getContextPath() %>/facilityList"><i class="fa-solid fa-calendar-check me-2"></i><strong>View Facilities</strong><p class="student-muted mb-0 mt-2">Browse and book available facilities.</p></a></div><div class="col-md-6"><a class="student-card student-action-card" href="<%= request.getContextPath() %>/equipmentList"><i class="fa-solid fa-dumbbell me-2"></i><strong>View Equipment</strong><p class="student-muted mb-0 mt-2">Borrow available equipment.</p></a></div><div class="col-md-6"><a class="student-card student-action-card" href="${pageContext.request.contextPath}/MyFacilityBookingServlet"><i class="fa-solid fa-bookmark me-2"></i><strong>My Facility Bookings</strong><p class="student-muted mb-0 mt-2">Track current and past bookings.</p></a></div><div class="col-md-6"><a class="student-card student-action-card" href="${pageContext.request.contextPath}/MyLoanServlet"><i class="fa-solid fa-handshake me-2"></i><strong>My Equipment Loans</strong><p class="student-muted mb-0 mt-2">View loans and return equipment.</p></a></div></div></div></div>
-</main></div></div><script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script></body></html>
+
+<%
+    request.setAttribute("pageTitle", "Student Dashboard");
+    request.setAttribute("pageSubtitle", "Welcome back and manage your student services.");
+%>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+    <link href="<%=request.getContextPath()%>/assets/css/student.css" rel="stylesheet">
+</head>
+
+<body class="student-ui-body">
+
+<div class="student-shell">
+
+    <!-- SIDEBAR -->
+    <jsp:include page="layout/sidebar.jsp"/>
+
+    <div class="student-main">
+
+        <!-- TOPBAR -->
+        <jsp:include page="layout/topbar.jsp"/>
+
+        <main class="student-content">
+
+            <!-- WELCOME CARD -->
+            <div class="student-card card mb-4">
+
+                <div class="card-body p-4">
+
+                    <div class="row align-items-center g-3">
+
+                        <div class="col-lg-8">
+
+                            <span class="badge badge-student-info rounded-pill mb-2">
+                                Student Portal
+                            </span>
+
+                            <h2 class="fw-bold mb-1">
+                                Welcome, ${sessionScope.studentName}
+                            </h2>
+
+                            <p class="student-muted mb-0">
+                                Book facilities, borrow equipment, and track your active requests.
+                            </p>
+
+                        </div>
+
+                        <div class="col-lg-4 text-lg-end">
+
+                            <a href="<%= request.getContextPath() %>/EditStudentProfileServlet"
+                               class="btn btn-student-primary">
+
+                                <i class="fa-regular fa-user me-2"></i>
+                                Edit Profile
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- STATS -->
+            <div class="row g-3 mb-4">
+
+                <div class="col-md-3">
+                    <div class="student-card card h-100">
+                        <div class="card-body">
+                            <div class="student-muted small fw-bold">Total Bookings</div>
+                            <h3>${totalBookings}</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="student-card card h-100">
+                        <div class="card-body">
+                            <div class="student-muted small fw-bold">Active Loans</div>
+                            <h3>${activeLoans}</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="student-card card h-100">
+                        <div class="card-body">
+                            <div class="student-muted small fw-bold">Pending Requests</div>
+                            <h3>${pendingRequests}</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="student-card card h-100">
+                        <div class="card-body">
+                            <div class="student-muted small fw-bold">Returned Items</div>
+                            <h3>${returnedItems}</h3>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- PROFILE + QUICK ACTIONS -->
+            <div class="row g-3 mb-4">
+
+                <!-- PROFILE -->
+                <div class="col-lg-4">
+                    <div class="student-card card h-100">
+
+                        <div class="card-header">
+                            Profile Summary
+                        </div>
+
+                        <div class="card-body">
+
+                            <p><strong>Student ID:</strong> ${studentID}</p>
+                            <p><strong>Programme:</strong> ${programme}</p>
+                            <p class="mb-0"><strong>Phone:</strong> ${phoneNumber}</p>
+
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- ACTIONS -->
+                <div class="col-lg-8">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+                            <a class="student-card student-action-card"
+                               href="<%= request.getContextPath() %>/facilityList">
+
+                                <i class="fa-solid fa-calendar-check me-2"></i>
+                                <strong>View Facilities</strong>
+
+                                <p class="student-muted mb-0 mt-2">
+                                    Browse and book available facilities.
+                                </p>
+
+                            </a>
+                        </div>
+
+                        <div class="col-md-6">
+                            <a class="student-card student-action-card"
+                               href="<%= request.getContextPath() %>/equipmentList">
+
+                                <i class="fa-solid fa-dumbbell me-2"></i>
+                                <strong>View Equipment</strong>
+
+                                <p class="student-muted mb-0 mt-2">
+                                    Borrow available equipment.
+                                </p>
+
+                            </a>
+                        </div>
+
+                        <div class="col-md-6">
+                            <a class="student-card student-action-card"
+                               href="${pageContext.request.contextPath}/MyFacilityBookingServlet">
+
+                                <i class="fa-solid fa-bookmark me-2"></i>
+                                <strong>My Facility Bookings</strong>
+
+                                <p class="student-muted mb-0 mt-2">
+                                    Track current and past bookings.
+                                </p>
+
+                            </a>
+                        </div>
+
+                        <div class="col-md-6">
+                            <a class="student-card student-action-card"
+                               href="${pageContext.request.contextPath}/MyLoanServlet">
+
+                                <i class="fa-solid fa-handshake me-2"></i>
+                                <strong>My Equipment Loans</strong>
+
+                                <p class="student-muted mb-0 mt-2">
+                                    View loans and return equipment.
+                                </p>
+
+                            </a>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </main>
+
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

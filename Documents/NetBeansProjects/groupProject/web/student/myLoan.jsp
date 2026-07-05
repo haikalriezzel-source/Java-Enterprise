@@ -1,9 +1,3 @@
-<%--
-    Document   : myLoan
-    Created on : Jun 24, 2026, 12:43:41 AM
-    Author     : haikalriez
---%>
-
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="com.bean.LoanEquipmentBean"%>
